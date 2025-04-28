@@ -17,6 +17,7 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.material)
+            implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
@@ -25,6 +26,9 @@ kotlin {
 
             // Compose
             implementation("org.jetbrains.compose.material3:material3-desktop:1.2.1")
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+
+            // Navigation
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
             // Coil
             implementation(libs.coil.compose.core)

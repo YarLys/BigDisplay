@@ -6,7 +6,7 @@ import androidx.compose.ui.window.application
 import io.ktor.client.engine.cio.CIO
 import org.example.bigdisplayproject.feature.display.network.NewsClient
 import org.example.bigdisplayproject.feature.display.network.createHttpClient
-import org.example.bigdisplayproject.feature.display.presentation.App
+import org.example.bigdisplayproject.feature.display.App
 
 fun main() = application {
     Window(

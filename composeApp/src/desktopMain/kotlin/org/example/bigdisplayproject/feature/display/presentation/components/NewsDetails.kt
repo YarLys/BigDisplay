@@ -3,7 +3,9 @@ package org.example.bigdisplayproject.feature.display.presentation.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,9 +15,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Text
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -27,7 +31,7 @@ import io.ktor.http.headers
 import org.example.bigdisplayproject.feature.display.network.dto.News
 
 @Composable
-fun NewsDetails(news: News) {
+fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -57,7 +61,7 @@ fun NewsDetails(news: News) {
                 Text(
                     text = news.date.toString()
                 )
-                if (news.image != null) {  // нужно добавить, чтобы, пока картинка грузится, был индикатор. Также обработку ошибки тоже можно добавить
+                if (news.image != null) {  // мб нужно добавить, чтобы, пока картинка грузится, был индикатор. Также обработку ошибки тоже можно добавить
                     AsyncImage(
                         model = ImageRequest.Builder(LocalPlatformContext.current)
                         .data(news.image.src)
@@ -76,8 +80,6 @@ fun NewsDetails(news: News) {
                             println("Ошибка загрузки. Проверьте URL и заголовки.")
                         }
                     )
-
-                    //URLImageLoader(news)
 
                     /*AsyncImage(
                         model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -106,31 +108,11 @@ fun NewsDetails(news: News) {
                         }
                     )*/
                 }
+
+                BackButton(
+                    onBackButtonClick = onBackButtonClick
+                )
             }
         }
     }
 }
-
-/*
-какое-то говно. вроде робит, если добавить другие либы, но при этом перестает работать предыдущий вариант
-@Composable
-fun URLImageLoader(news: News) {
-    val painter = rememberAsyncImagePainter(news.image!!.src)
-    val state = painter.state
-
-    when (state) {
-        is AsyncImagePainter.State.Empty,
-        is AsyncImagePainter.State.Loading -> {
-            CircularProgressIndicator()
-        }
-        is AsyncImagePainter.State.Success -> {
-            Image(
-                painter = painter,
-                contentDescription = null
-            )
-        }
-        is AsyncImagePainter.State.Error -> {
-            println("Ошибка загрузки. Проверьте URL и заголовки.")
-        }
-    }
-}*/
