@@ -26,6 +26,10 @@ import org.example.bigdisplayproject.feature.display.presentation.components.New
 @Preview
 fun App(client: NewsClient) {
     MaterialTheme {
+
+
+
+
         val store = remember {
             DisplayStoreFactory(storeFactory = DefaultStoreFactory(), client).create()
         }
