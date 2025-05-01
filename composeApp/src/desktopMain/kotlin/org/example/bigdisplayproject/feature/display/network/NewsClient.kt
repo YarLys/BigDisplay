@@ -51,9 +51,9 @@ class NewsClient(
         }
 
         // удалить потом. использовалось для проверки, что данные в utf-8
-        val bytes: ByteArray = response.body()
+        /*val bytes: ByteArray = response.body()
         val utf8String = bytes.toString(Charsets.UTF_8)
-        File("debug_output.txt").writeText(utf8String, Charsets.UTF_8)
+        File("debug_output.txt").writeText(utf8String, Charsets.UTF_8)*/
 
         return when(response.status.value) {
             in 200..299 -> {

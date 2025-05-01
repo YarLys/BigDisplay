@@ -1,14 +1,10 @@
 package org.example.bigdisplayproject.feature.display
 
 import com.arkivanov.mvikotlin.core.store.*
-import com.arkivanov.mvikotlin.core.utils.JvmSerializable
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.example.bigdisplayproject.feature.display.network.NewsClient
-import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.util.onError
 import org.example.bigdisplayproject.feature.display.util.onSuccess
 
@@ -53,9 +49,6 @@ internal class DisplayStoreFactory(
             dispatch(DisplayStore.Message.Loading)
             val news = newsClient.getNews()
                 .onSuccess {
-                    for (i in 1..<it.size) {
-                        println(it[i].toString())
-                    }
                     dispatch(DisplayStore.Message.NewsLoaded(it))
                 }
                 .onError {
@@ -64,9 +57,18 @@ internal class DisplayStoreFactory(
                 }
         }
 
-        private fun getNewsById(id: Long) {
-            val selected = state().news.find { it.id == id }
-            selected?.let { dispatch(DisplayStore.Message.NewsSelected(it)) }
+        private fun getNewsById(id: Long) = scope.launch {
+            /*val selected = state().news.find { it.id == id }
+            selected?.let { dispatch(DisplayStore.Message.NewsSelected(it)) }*/
+            dispatch(DisplayStore.Message.Loading)
+            val news = newsClient.getNewsById(id)
+                .onSuccess {
+                    dispatch(DisplayStore.Message.NewsSelected(it))
+                }
+                .onError {
+                    println("ERROR: ${it.toString()}")
+                    dispatch(DisplayStore.Message.Error(it.toString()))
+                }
         }
 
         private fun refresh() {
@@ -83,7 +85,15 @@ internal class DisplayStoreFactory(
                     news = msg.news,
                     error = null
                 )
-                is DisplayStore.Message.NewsSelected -> copy(selectedNews = msg.news)
+                is DisplayStore.Message.NewsSelected -> {
+                    if (msg.news.id != selectedNews?.id) {
+                        copy(
+                            isLoading = false,
+                            selectedNews = msg.news
+                        )
+                    }
+                    else copy(isLoading = false)
+                }
                 is DisplayStore.Message.Error -> copy(isLoading = false, error = msg.message)
                 is DisplayStore.Message.Loading -> copy(isLoading = true)
             }

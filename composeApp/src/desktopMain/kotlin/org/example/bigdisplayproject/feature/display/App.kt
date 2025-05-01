@@ -57,18 +57,17 @@ fun App(client: NewsClient) {
                         when {
                             state.isLoading -> CircularProgressIndicator()
                             state.error != null -> Text("Ошибка: ${state.error}")
-                            //state.selectedNews != null -> NewsDetails(state.selectedNews!!)
-                            /*else -> NewsList(state.news) { id ->
-                                store.accept(DisplayStore.Intent.GetNewsById(id))
-                            }*/
                             else -> {
                                 NewsList(
                                     news = state.news,
                                     onItemClick = { id ->
-                                        store.accept(DisplayStore.Intent.GetNewsById(id))
                                         navController.navigate(
                                             Route.NewsDetail(id)
                                         )
+                                    },
+                                    isRefreshing = false,
+                                    onRefresh = {
+                                        store.accept(DisplayStore.Intent.Refresh)
                                     }
                                 )
                             }
@@ -80,17 +79,28 @@ fun App(client: NewsClient) {
                     exitTransition = { fadeOut() }
                 ) { entry ->
                     val args = entry.toRoute<Route.NewsDetail>()
-                    println("SELECTED NEWS_ID: ${args.id}")   // debug
+
+                    LaunchedEffect(Unit) {
+                        println("SELECTED NEWS_ID: ${args.id}")
+                    }   // debug
+
+                    LaunchedEffect(args.id) {
+                        store.accept(DisplayStore.Intent.GetNewsById(args.id))
+                    }
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
                     ) {
-                        NewsDetails(
-                            news = state.selectedNews!!,
-                            onBackButtonClick = {
-                                navController.navigateUp()
-                            }
-                        )
+                        if (state.error != null) { Text("Ошибка: ${state.error}") }
+                        else if (state.isLoading) { CircularProgressIndicator() }
+                        else state.selectedNews?.let { news ->
+                            NewsDetails(
+                                news = news,
+                                onBackButtonClick = {
+                                    navController.navigateUp()
+                                }
+                            )
+                        } ?: Text("Новость не найдена")
                     }
                 }
             }

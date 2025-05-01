@@ -1,11 +1,8 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,17 +12,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import coil3.compose.AsyncImagePainter
 import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
 import coil3.request.ImageRequest
 import io.ktor.http.headers
 import org.example.bigdisplayproject.feature.display.network.dto.News
@@ -50,10 +42,12 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Text(
-                    text = news.name ?: "Новость"
-                )
-                Spacer(modifier = Modifier.height(8.dp))
+                if (news.name != null) {
+                    Text(
+                        text = news.name
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
                 Text(
                     text = news.text // мб добавить скролл и сделать ограниченное кол-во текста?
                 )
@@ -68,8 +62,6 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                         .apply {
                             headers {
                                 append("User-Agent", "Mozilla/5.0")
-                            }
-                            headers {
                                 append("Referer", "https://vk.com/")
                             }
                         }
@@ -87,8 +79,6 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                             .apply {
                                 headers {
                                     append("User-Agent", "Mozilla/5.0")
-                                }
-                                headers {
                                     append("Referer", "https://vk.com/")
                                 }
                             }
