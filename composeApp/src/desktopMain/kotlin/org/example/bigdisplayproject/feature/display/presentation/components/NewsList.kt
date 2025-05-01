@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -11,6 +12,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -25,6 +27,10 @@ fun NewsList(
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val listState = rememberSaveable(saver = LazyListState.Saver) {
+        LazyListState(0, 0)
+    }
+
     /*val refreshState = rememberPullToRefreshState()
     PullToRefreshBox(
         state = refreshState,
@@ -32,7 +38,10 @@ fun NewsList(
         onRefresh = onRefresh,
         modifier = modifier
     ) {*/
-        LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        LazyColumn(
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
             items(news) { item ->
                 Card(
                     modifier = Modifier

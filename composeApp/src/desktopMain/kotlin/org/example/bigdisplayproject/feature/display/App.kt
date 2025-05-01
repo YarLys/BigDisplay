@@ -47,8 +47,8 @@ fun App(client: NewsClient) {
                 startDestination = Route.NewsList
             ) {
                 composable<Route.NewsList> (
-                    exitTransition = { slideOutHorizontally() },
-                    popEnterTransition = { slideInHorizontally() }
+                    exitTransition = { slideOutHorizontally { it } },
+                    popEnterTransition = { slideInHorizontally { it } }
                 ) {
                     Column(
                         modifier = Modifier
@@ -63,7 +63,12 @@ fun App(client: NewsClient) {
                                     onItemClick = { id ->
                                         navController.navigate(
                                             Route.NewsDetail(id)
-                                        )
+                                        ) {
+                                            popUpTo(Route.NewsList) {
+                                                saveState = true // Сохраняем состояние списка
+                                            }
+                                            restoreState = true // Восстанавливаем при возврате
+                                        }
                                     },
                                     isRefreshing = false,
                                     onRefresh = {
