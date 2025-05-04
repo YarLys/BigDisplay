@@ -8,7 +8,7 @@ import androidx.compose.ui.window.rememberWindowState
 import io.ktor.client.engine.cio.CIO
 import org.example.bigdisplayproject.feature.display.network.NewsClient
 import org.example.bigdisplayproject.feature.display.network.createHttpClient
-import org.example.bigdisplayproject.feature.display.App
+import org.example.bigdisplayproject.feature.display.presentation.App
 
 fun main() = application {
     Window(

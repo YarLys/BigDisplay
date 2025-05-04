@@ -15,6 +15,7 @@ internal interface DisplayStore : Store<DisplayStore.Intent, DisplayStore.State,
         object GetNews : Intent
         data class GetNewsById(val id: Long) : Intent
         object Refresh : Intent
+        data class UpdateScrollPosition(val position: Int) : Intent
     }
 
     // Сообщения от executor к reducer
@@ -23,6 +24,7 @@ internal interface DisplayStore : Store<DisplayStore.Intent, DisplayStore.State,
         data class NewsSelected(val news: News) : Message
         data class Error(val message: String) : Message
         object Loading : Message
+        data class ScrollPositionUpdated(val position: Int) : Message
     }
 
     // Состояние
@@ -30,7 +32,8 @@ internal interface DisplayStore : Store<DisplayStore.Intent, DisplayStore.State,
         val isLoading: Boolean = false,
         val news: List<News> = emptyList(),
         val selectedNews: News? = null,
-        val error: String? = null
+        val error: String? = null,
+        val scrollPosition: Int = 0
     ) : JvmSerializable
 
 }

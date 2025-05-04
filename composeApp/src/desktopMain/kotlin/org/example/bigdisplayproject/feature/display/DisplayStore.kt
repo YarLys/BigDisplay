@@ -42,6 +42,7 @@ internal class DisplayStoreFactory(
                 is DisplayStore.Intent.GetNews -> getNews()
                 is DisplayStore.Intent.GetNewsById -> getNewsById(intent.id)
                 is DisplayStore.Intent.Refresh -> refresh()
+                is DisplayStore.Intent.UpdateScrollPosition -> dispatch(DisplayStore.Message.ScrollPositionUpdated(intent.position))
             }
         }
 
@@ -96,6 +97,7 @@ internal class DisplayStoreFactory(
                 }
                 is DisplayStore.Message.Error -> copy(isLoading = false, error = msg.message)
                 is DisplayStore.Message.Loading -> copy(isLoading = true)
+                is DisplayStore.Message.ScrollPositionUpdated -> copy(scrollPosition = msg.position)
             }
     }
 }

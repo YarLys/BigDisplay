@@ -9,7 +9,7 @@ plugins {
 
 kotlin {
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
         
@@ -27,6 +27,7 @@ kotlin {
             // Compose
             implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+            // Video player
 
             // Navigation
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
@@ -53,6 +54,8 @@ kotlin {
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
+            implementation("uk.co.caprica:vlcj:4.7.0")
         }
     }
 }

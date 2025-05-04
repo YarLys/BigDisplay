@@ -1,18 +1,19 @@
-package org.example.bigdisplayproject.feature.display
+package org.example.bigdisplayproject.feature.display.presentation
 
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -22,6 +23,8 @@ import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.example.bigdisplayproject.feature.display.DisplayStore
+import org.example.bigdisplayproject.feature.display.DisplayStoreFactory
 import org.example.bigdisplayproject.feature.display.network.NewsClient
 import org.example.bigdisplayproject.feature.display.presentation.components.NewsDetails
 import org.example.bigdisplayproject.feature.display.presentation.components.NewsList
@@ -32,7 +35,6 @@ import org.example.bigdisplayproject.feature.display.presentation.navigation.Rou
 @Preview
 fun App(client: NewsClient) {
     MaterialTheme {
-
         val store = remember {
             DisplayStoreFactory(storeFactory = DefaultStoreFactory(), client).create()
         }
@@ -50,16 +52,16 @@ fun App(client: NewsClient) {
                     exitTransition = { slideOutHorizontally { it } },
                     popEnterTransition = { slideInHorizontally { it } }
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
                         when {
                             state.isLoading -> CircularProgressIndicator()
                             state.error != null -> Text("Ошибка: ${state.error}")
                             else -> {
                                 NewsList(
-                                    news = state.news,
+                                    newsList = state.news,
                                     onItemClick = { id ->
                                         navController.navigate(
                                             Route.NewsDetail(id)
@@ -70,9 +72,17 @@ fun App(client: NewsClient) {
                                             restoreState = true // Восстанавливаем при возврате
                                         }
                                     },
-                                    isRefreshing = false,
+                                    /*isRefreshing = false,
                                     onRefresh = {
                                         store.accept(DisplayStore.Intent.Refresh)
+                                    },*/
+                                    scrollPosition = state.scrollPosition,
+                                    onScrollPositionChanged = { position ->
+                                        store.accept(
+                                            DisplayStore.Intent.UpdateScrollPosition(
+                                                position
+                                            )
+                                        )
                                     }
                                 )
                             }
@@ -92,13 +102,15 @@ fun App(client: NewsClient) {
                     LaunchedEffect(args.id) {
                         store.accept(DisplayStore.Intent.GetNewsById(args.id))
                     }
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
-                        if (state.error != null) { Text("Ошибка: ${state.error}") }
-                        else if (state.isLoading) { CircularProgressIndicator() }
-                        else state.selectedNews?.let { news ->
+                        if (state.error != null) {
+                            Text("Ошибка: ${state.error}")
+                        } else if (state.isLoading) {
+                            CircularProgressIndicator()
+                        } else state.selectedNews?.let { news ->
                             NewsDetails(
                                 news = news,
                                 onBackButtonClick = {

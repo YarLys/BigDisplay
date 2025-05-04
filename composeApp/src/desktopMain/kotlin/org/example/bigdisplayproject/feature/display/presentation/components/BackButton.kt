@@ -17,10 +17,45 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BackButton(
-    onBackButtonClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onBackButtonClick: () -> Unit
 ) {
-    var isPressed by remember { mutableStateOf(false) }
+    OutlinedButton(
+        onClick = onBackButtonClick,
+        modifier = Modifier
+            .height(48.dp)
+            .clip(RoundedCornerShape(24.dp)),
+        shape = ButtonDefaults.outlinedShape,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
+        contentPadding = PaddingValues(
+            start = 16.dp,
+            top = 8.dp,
+            end = 24.dp,
+            bottom = 8.dp
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+            )
+            Text(
+                text = "Назад",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+
+
+    /*var isPressed by remember { mutableStateOf(false) }
     val elevation by animateFloatAsState(
         targetValue = if (isPressed) 2.dp.value else 6.dp.value,
         label = "buttonElevation"
@@ -74,5 +109,5 @@ fun BackButton(
                 color = MaterialTheme.colorScheme.primary
             )
         }
-    }
+    }*/
 }
