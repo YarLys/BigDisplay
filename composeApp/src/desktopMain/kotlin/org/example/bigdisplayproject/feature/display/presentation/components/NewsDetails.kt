@@ -75,7 +75,7 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                 ) {
                     val attachment = checkAttachments(news)
                     if (news.image != null || attachment != null) {
-                        var src = ""
+                        /*var src = ""
                         if (attachment != null) {
                             src = when (attachment) {
                                 is Photo -> attachment.image.src
@@ -83,36 +83,38 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                                 else -> { "" } // because here no other options
                             }
                         }
-                        else src = news.image!!.src
+                        else src = news.image!!.src*/
 
-                        /*var pagerState = rememberPagerState(pageCount = { news.attachments.size })
-                        Box(modifier = Modifier.fillMaxSize()) {
+                        var pagerState = rememberPagerState(pageCount = { news.attachments.size })
+                        Box(
+                            modifier = Modifier
+                                .height(400.dp)
+                                .fillMaxWidth()
+                        ) {
                             HorizontalPager(
                                 state = pagerState,
-                                key = { news.attachments[it] },
-                                pageSize = PageSize.Fixed(250.dp)
+                                key = { news.attachments[it] }
                             ) { index ->
-
-                            }
-                        }*/
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalPlatformContext.current)
-                                .data(src)
-                                .apply {
-                                    headers {
-                                        append("User-Agent", "Mozilla/5.0")
-                                        append("Referer", "https://vk.com/")
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                                        .data(news.attachments[index])
+                                        .apply {
+                                            headers {
+                                                append("User-Agent", "Mozilla/5.0")
+                                                append("Referer", "https://vk.com/")
+                                            }
+                                        }
+                                        .build(),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .clip(RoundedCornerShape(8.dp)),
+                                    onError = { error ->
+                                        println("Ошибка загрузки. Проверьте URL и заголовки.")
                                     }
-                                }
-                                .build(),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(8.dp)),
-                            onError = { error ->
-                                println("Ошибка загрузки. Проверьте URL и заголовки.")
+                                )
                             }
-                        )
+                        }
                         Spacer(modifier = Modifier.width(16.dp))
                     }
 
