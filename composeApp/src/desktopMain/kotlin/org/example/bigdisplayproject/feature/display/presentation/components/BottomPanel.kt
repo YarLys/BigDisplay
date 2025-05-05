@@ -34,11 +34,13 @@ fun BottomPanel(
 ) {
     val currentTime = remember { mutableStateOf(getCurrentTime()) }
     val currentLabel = remember { mutableStateOf(getLabelText(currentTime.value)) }
+    val currentWeek = remember { mutableStateOf(getCurrentWeek(currentTime.value)) }
     LaunchedEffect(Unit) {
         while (true) {
             delay(1000)
             currentTime.value = getCurrentTime()
             currentLabel.value = getLabelText(currentTime.value)
+            currentWeek.value = getCurrentWeek(currentTime.value)
         }
     }
 
@@ -60,7 +62,7 @@ fun BottomPanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             BackButton { onBackButtonClick() }
-            OutlinedButton(
+            /*OutlinedButton(
                 onClick = {  },
                 shape = CircleShape,
                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
@@ -70,23 +72,23 @@ fun BottomPanel(
                 )
             ) {
                 Text("RTUITLab", style = MaterialTheme.typography.labelLarge)
-            }
+            }*/
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     currentLabel.value,
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 Text(
-                    text = currentTime.value,
+                    text = currentTime.value.substring(0, 9),
                     style = MaterialTheme.typography.headlineMedium
                 )
 
                 Text(
-                    "13-я неделя  1 мая 2025 г.",
-                    style = MaterialTheme.typography.labelSmall
+                    text = currentWeek.value,
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -94,15 +96,14 @@ fun BottomPanel(
 }
 
 private fun getCurrentTime(): String {
-    val sdf = SimpleDateFormat("HH:mm:ss")
+    val sdf = SimpleDateFormat("HH:mm:ss dd-MM-yyyy")
     return sdf.format(Date())
 }
 
 private fun getLabelText(time: String): String {  // мб можно улучшить, пока что пофиг
     val hh = time.substring(0, 2).toInt()
     val mm = time.substring(3, 5).toInt()
-    println(hh)
-    println(mm)
+
     if (hh == 9 || (hh == 10 && mm <= 29)) return "Идёт 1-ая пара"
     else if (hh == 10 && mm in 30..39) return "Перерыв перед 2-ой парой"
     else if (hh == 11 || (hh == 10 && mm in 40..60) || (hh == 12 && mm <= 9)) return "Идёт 2-ая пара"
@@ -117,4 +118,13 @@ private fun getLabelText(time: String): String {  // мб можно улучш�
     else if (hh == 19 && mm in 30..39) return "Перерыв перед 7-ой парой"
     else if ((hh == 19 && mm in 40..60) || hh == 20 || (hh == 21 && mm <= 9)) return "Идёт 7-ая пара"
     else return ""
+}
+
+private fun getCurrentWeek(time: String): String {   // тоже ужас, надо переделывать
+    val dd = time.substring(9, 11).toInt()
+    val MM = time.substring(12, 14).toInt()
+
+    val dd_now = 5
+    val week = 13 + (dd - dd_now) / 7
+    return "$week-я неделя ${time.substring(9)}"
 }

@@ -84,20 +84,29 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                             }
                         }
                         else src = news.image!!.src*/
-
-                        var pagerState = rememberPagerState(pageCount = { news.attachments.size })
+                        val attachments = news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" }
+                        for (att in news.attachments) {
+                            println(att.type)
+                        }
+                        var pagerState = rememberPagerState(pageCount = { attachments.size })
                         Box(
                             modifier = Modifier
-                                .height(400.dp)
+                                //.height(400.dp)
                                 .fillMaxWidth()
                         ) {
                             HorizontalPager(
                                 state = pagerState,
-                                key = { news.attachments[it] }
+                                key = { attachments[it] }
                             ) { index ->
                                 AsyncImage(
                                     model = ImageRequest.Builder(LocalPlatformContext.current)
-                                        .data(news.attachments[index])
+                                        .data(
+                                            when (val attachment = attachments[index]) {
+                                                is Photo -> attachment.image.src
+                                                is Link -> attachment.image.src
+                                                else -> ""
+                                            }
+                                        )
                                         .apply {
                                             headers {
                                                 append("User-Agent", "Mozilla/5.0")
