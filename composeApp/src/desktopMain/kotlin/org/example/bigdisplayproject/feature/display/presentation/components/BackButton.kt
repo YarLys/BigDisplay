@@ -8,106 +8,57 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BACK_BUTTON_HEIGHT
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BACK_BUTTON_WIDTH
+import org.example.bigdisplayproject.ui.theme.DarkGray
+import org.example.bigdisplayproject.ui.theme.LightWhite
 
 @Composable
 fun BackButton(
     onBackButtonClick: () -> Unit
 ) {
-    OutlinedButton(
+
+    Button(
         onClick = onBackButtonClick,
         modifier = Modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(24.dp)),
+            .height(BACK_BUTTON_HEIGHT.pxToDp())
+            .width(BACK_BUTTON_WIDTH.pxToDp())
+            .clip(RoundedCornerShape(10.dp)),
         shape = ButtonDefaults.outlinedShape,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)),
         contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 8.dp,
-            end = 24.dp,
-            bottom = 8.dp
+            start = 8.dp,
+            top = 4.dp,
+            end = 12.dp,
+            bottom = 4.dp
         ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-            contentColor = MaterialTheme.colorScheme.onSurface
+        colors = ButtonDefaults.buttonColors(
+            containerColor = LightWhite
         )
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.9f)
+                tint = DarkGray
             )
             Text(
                 text = "Назад",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyMedium,
+                color = DarkGray
             )
         }
     }
-
-
-    /*var isPressed by remember { mutableStateOf(false) }
-    val elevation by animateFloatAsState(
-        targetValue = if (isPressed) 2.dp.value else 6.dp.value,
-        label = "buttonElevation"
-    )
-
-    OutlinedButton(
-        onClick = onBackButtonClick,
-        modifier = modifier
-            .height(48.dp)
-            .clip(RoundedCornerShape(24.dp)),
-        shape = RoundedCornerShape(24.dp),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.primary
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
-        elevation = ButtonDefaults.buttonElevation(
-            defaultElevation = elevation.dp,
-            pressedElevation = 2.dp
-        ),
-        interactionSource = remember { MutableInteractionSource() }.also { source ->
-            LaunchedEffect(source) {
-                source.interactions.collect {
-                    when (it) {
-                        is PressInteraction.Press -> isPressed = true
-                        is PressInteraction.Release -> isPressed = false
-                        is PressInteraction.Cancel -> isPressed = false
-                    }
-                }
-            }
-        },
-        contentPadding = PaddingValues(
-            start = 16.dp,
-            top = 8.dp,
-            end = 24.dp,
-            bottom = 8.dp
-        )
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack, // Ваша иконка
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "Назад",
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
-    }*/
 }

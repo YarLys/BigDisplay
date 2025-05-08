@@ -65,7 +65,7 @@ fun NewsList(
         ) {
             LazyVerticalGrid(
                 state = listState,
-                columns = GridCells.Fixed(2),
+                columns = GridCells.Fixed(3),
                 modifier = Modifier.weight(1f),
                 contentPadding = PaddingValues(horizontal = 16.dp)
             ) {

@@ -23,6 +23,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(compose.materialIconsExtended) // For icons
 
             // Compose
             implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")

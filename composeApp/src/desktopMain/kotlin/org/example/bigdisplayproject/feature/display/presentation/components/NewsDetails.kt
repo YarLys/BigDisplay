@@ -31,6 +31,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -40,13 +42,15 @@ import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
+import org.example.bigdisplayproject.ui.theme.LightWhite
 
 @Composable
 fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
 
     val scope = rememberCoroutineScope()
-
+    // фулл переписать
     Scaffold(
+        containerColor = Color.Gray,
         bottomBar = { BottomPanel { onBackButtonClick() } }
     ) { paddingValues ->
         Column(
@@ -58,11 +62,27 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = LightWhite
+                ),
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
-                    .padding(24.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
+                    .padding(16.dp)
+                    .shadow(
+                        ambientColor = LightWhite,
+                        spotColor = LightWhite,
+                        elevation = 24.dp,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .shadow(
+                        ambientColor = LightWhite,
+                        spotColor = LightWhite,
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    ,
+                shape = RoundedCornerShape(12.dp)
+                //elevation = CardDefaults.cardElevation(8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -124,7 +144,6 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                         if (attachments.size > 1) {
                             Box(
                                 modifier = Modifier
-                                    //.offset(y = -(16).dp)
                                     .fillMaxWidth(0.3f)
                                     .clip(RoundedCornerShape(100))
                                     .background(MaterialTheme.colorScheme.background)

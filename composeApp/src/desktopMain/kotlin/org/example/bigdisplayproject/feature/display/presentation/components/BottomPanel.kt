@@ -1,20 +1,13 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +16,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import bigdisplayproject.composeapp.generated.resources.Res
 import kotlinx.coroutines.delay
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BOTTOM_PANEL_HEIGHT
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BOTTOM_PANEL_ICONS_SPACE
+import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
+import org.example.bigdisplayproject.ui.theme.DarkGray
+import org.jetbrains.compose.resources.painterResource
+import bigdisplayproject.composeapp.generated.resources.iit_logo
+import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo
+import bigdisplayproject.composeapp.generated.resources.separator
+import org.example.bigdisplayproject.ui.theme.LightWhite
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -45,14 +49,10 @@ fun BottomPanel(
     }
 
     Surface(
-        tonalElevation = 16.dp,
-        shadowElevation = 8.dp,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = RoundedCornerShape(
-            topStart = 16.dp,
-            topEnd = 16.dp
-        ),
-        modifier = Modifier.fillMaxWidth()
+        color = DarkGray,
+        modifier = Modifier
+            .height(BOTTOM_PANEL_HEIGHT.pxToDp())
+            .fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -62,33 +62,48 @@ fun BottomPanel(
             verticalAlignment = Alignment.CenterVertically
         ) {
             BackButton { onBackButtonClick() }
-            /*OutlinedButton(
-                onClick = {  },
-                shape = CircleShape,
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.primary
-                )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(BOTTOM_PANEL_ICONS_SPACE.pxToDp())
             ) {
-                Text("RTUITLab", style = MaterialTheme.typography.labelLarge)
-            }*/
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+                Image(painterResource(Res.drawable.iit_logo), null)
                 Text(
-                    currentLabel.value,
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "Институт Информационных\nТехнологий",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = LightWhite,
+                    textAlign = TextAlign.Center
                 )
+                Image(painterResource(Res.drawable.separator), null)
+                Image(painterResource(Res.drawable.rtuitlab_logo), null)
+                Text(
+                    text = "RTUITLab",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = LightWhite
+                )
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(BOTTOM_PANEL_ICONS_SPACE.pxToDp()),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        currentLabel.value,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = LightWhite
+                    )
+                    Text(
+                        text = currentWeek.value,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = LightWhite
+                    )
+                }
 
                 Text(
                     text = currentTime.value.substring(0, 9),
-                    style = MaterialTheme.typography.headlineMedium
-                )
-
-                Text(
-                    text = currentWeek.value,
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = LightWhite
                 )
             }
         }
@@ -120,11 +135,19 @@ private fun getLabelText(time: String): String {  // мб можно улучш�
     else return ""
 }
 
-private fun getCurrentWeek(time: String): String {   // тоже ужас, надо переделывать
+private fun getCurrentWeek(time: String): String {   // надо переделывать, временное решение
     val dd = time.substring(9, 11).toInt()
     val MM = time.substring(12, 14).toInt()
 
-    val dd_now = 5
-    val week = 13 + (dd - dd_now) / 7
+    var week = 0
+    var dd_now = 5
+    if (MM == 5) {
+        dd_now = 5
+        week = 13 + (dd - dd_now) / 7
+    }
+    else {
+        dd_now = 2
+        week = 17 + (dd - dd_now) / 7
+    }
     return "$week-я неделя ${time.substring(9)}"
 }
