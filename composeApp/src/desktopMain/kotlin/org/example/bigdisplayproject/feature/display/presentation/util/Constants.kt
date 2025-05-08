@@ -8,4 +8,6 @@ object Constants {
 
     const val BOTTOM_PANEL_HEIGHT = 100
     const val BOTTOM_PANEL_ICONS_SPACE = 30
+
+    const val PADDING_BETWEEN_CARDS = 30
 }
