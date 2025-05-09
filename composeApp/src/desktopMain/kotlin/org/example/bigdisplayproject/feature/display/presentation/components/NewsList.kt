@@ -16,6 +16,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
@@ -78,7 +82,10 @@ fun NewsList(
     scrollPosition: Int,
     onScrollPositionChanged: (Int) -> Unit
 ) {
-    val listState = rememberLazyGridState(
+    /*val listState = rememberLazyGridState(
+        initialFirstVisibleItemIndex = scrollPosition
+    )*/
+    val listState = rememberLazyStaggeredGridState(
         initialFirstVisibleItemIndex = scrollPosition
     )
     LaunchedEffect(listState) {
@@ -112,12 +119,14 @@ fun NewsList(
                     }
                 }
         ) {
-            LazyVerticalGrid(
+            LazyVerticalStaggeredGrid(
                 state = listState,
-                columns = GridCells.Fixed(3),
+                columns = StaggeredGridCells.Fixed(3),
+                modifier = Modifier
+                    .fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 80.dp, vertical = 35.dp),
-                verticalArrangement = Arrangement.spacedBy(PADDING_BETWEEN_CARDS.pxToDp()),
-                horizontalArrangement = Arrangement.spacedBy(PADDING_BETWEEN_CARDS.pxToDp())
+                horizontalArrangement = Arrangement.spacedBy(PADDING_BETWEEN_CARDS.pxToDp()),
+                verticalItemSpacing = PADDING_BETWEEN_CARDS.pxToDp()
             ) {
                 items(newsList) { news ->
                     NewsCard(news = news, onItemClick)

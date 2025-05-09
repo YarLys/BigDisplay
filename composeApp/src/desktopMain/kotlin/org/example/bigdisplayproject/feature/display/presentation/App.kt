@@ -14,8 +14,10 @@ import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
@@ -49,8 +51,8 @@ fun App(client: NewsClient) {
                 startDestination = Route.NewsList
             ) {
                 composable<Route.NewsList> (
-                    exitTransition = { slideOutHorizontally { it } },
-                    popEnterTransition = { slideInHorizontally { it } }
+                   // exitTransition = { slideOutHorizontally { it } },
+                   // popEnterTransition = { slideInHorizontally { it } }
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -89,9 +91,14 @@ fun App(client: NewsClient) {
                         }
                     }
                 }
-                composable<Route.NewsDetail>(
-                    enterTransition = { fadeIn() },
-                    exitTransition = { fadeOut() }
+                dialog<Route.NewsDetail>(
+                    dialogProperties = DialogProperties(
+                        usePlatformDefaultWidth = false,
+                        dismissOnBackPress = true,
+                        dismissOnClickOutside = true
+                    )
+                    //enterTransition = { fadeIn() },
+                    //exitTransition = { fadeOut() }
                 ) { entry ->
                     val args = entry.toRoute<Route.NewsDetail>()
 

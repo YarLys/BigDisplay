@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -44,6 +46,7 @@ import org.example.bigdisplayproject.feature.display.network.dto.Attachment
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
+import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
 
@@ -52,11 +55,14 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
+    val cardHeight = getCardHeight(news)
+    val hasImage = cardHeight != 200.dp
+
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .height(260.dp)
+            .height(cardHeight)
             .hoverable(interactionSource)
             .shadow(
                 elevation = if (isHovered) 24.dp else 8.dp,
@@ -91,16 +97,16 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                val attachment = checkAttachments(news)
-                if (news.image != null || attachment != null) {
+            val attachment = checkAttachments(news)
+            if (news.image != null || attachment != null) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
                     var src = ""
                     if (attachment != null) {
                         src = when (attachment) {
@@ -128,7 +134,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                             println("Ошибка загрузки. Проверьте URL и заголовки.")
                         }
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height((20).pxToDp()))
                 }
             }
             Text(
@@ -137,8 +143,15 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 maxLines = 3,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .weight(0.4f)
                     .padding(horizontal = 4.dp)
+                    .then(
+                        if (hasImage) {
+                            Modifier.weight(0.4f)
+                        } else {
+                            Modifier
+                        }
+                    ),
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -151,6 +164,31 @@ fun checkAttachments(news: News): Attachment? {
         }
     }
     return null
+}
+
+fun getCardHeight(news: News): Dp {
+    val attachment = checkAttachments(news)
+    if (attachment != null) {
+        if (attachment is Photo) {
+            return when {
+                attachment.image.height > attachment.image.width -> 600.dp
+                attachment.image.height == attachment.image.width -> 450.dp
+                else -> 300.dp
+            }
+        } else if (attachment is Link) {
+            return when {
+                attachment.image.height > attachment.image.width -> 600.dp
+                attachment.image.height == attachment.image.width -> 450.dp
+                else -> 300.dp
+            }
+        } else return 200.dp   // unnecessary
+    } else if (news.image != null) {
+        return when {
+            news.image.height > news.image.width -> 600.dp
+            news.image.height == news.image.width -> 450.dp
+            else -> 300.dp
+        }
+    } else return 200.dp
 }
 
 

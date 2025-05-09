@@ -1,10 +1,13 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -42,13 +46,165 @@ import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_BETWEEN
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING_TEXT
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_WIDTH
+import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite
 
 @Composable
-fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
+fun NewsDetails(
+    news: News,
+    onBackButtonClick: () -> Unit
+) {
 
     val scope = rememberCoroutineScope()
-    // фулл переписать
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            //.clickable { onBackButtonClick()
+    ) {
+        Card(
+            modifier = Modifier
+                .width(CARD_DETAIL_WIDTH.pxToDp())
+                .height(700.dp)
+                .align(Alignment.Center),
+            colors = CardDefaults.cardColors(
+                containerColor = LightWhite,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(CARD_DETAIL_PADDING.pxToDp()),
+                horizontalArrangement = Arrangement.spacedBy(CARD_DETAIL_BETWEEN.pxToDp())
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    val attachment = checkAttachments(news)
+                    if (news.image != null || attachment != null) {
+                        val attachments =
+                            news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" }
+
+                        var pagerState = rememberPagerState(pageCount = { attachments.size })
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clip(RoundedCornerShape(16.dp))
+                        ) {
+                            HorizontalPager(
+                                state = pagerState,
+                                key = { attachments[it] }
+                            ) { index ->
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalPlatformContext.current)
+                                        .data(
+                                            when (val attachment = attachments[index]) {
+                                                is Photo -> attachment.image.src
+                                                is Link -> attachment.image.src
+                                                else -> ""
+                                            }
+                                        )
+                                        .apply {
+                                            headers {
+                                                append("User-Agent", "Mozilla/5.0")
+                                                append("Referer", "https://vk.com/")
+                                            }
+                                        }
+                                        .build(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Fit,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(16.dp)),
+                                    onError = { error ->
+                                        println("Ошибка загрузки. Проверьте URL и заголовки.")
+                                    }
+                                )
+                            }
+                        }
+                        /*if (attachments.size > 1) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.3f)
+                                    .clip(RoundedCornerShape(100))
+                                    .background(MaterialTheme.colorScheme.background)
+                                    .padding(8.dp)
+                                    .align(Alignment.CenterHorizontally)
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            pagerState.animateScrollToPage(
+                                                pagerState.currentPage - 1
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterStart)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        contentDescription = "Go back"
+                                    )
+                                }
+                                IconButton(
+                                    onClick = {
+                                        scope.launch {
+                                            pagerState.animateScrollToPage(
+                                                pagerState.currentPage + 1
+                                            )
+                                        }
+                                    },
+                                    modifier = Modifier.align(Alignment.CenterEnd)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                        contentDescription = "Go forward"
+                                    )
+                                }
+                            }
+                        }*/
+                    }
+                }
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .padding(CARD_DETAIL_PADDING_TEXT.pxToDp())
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(CARD_DETAIL_PADDING.pxToDp())
+                ) {
+                    Text(
+                        text = news.date.toString(),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Black
+                    )
+
+                    if (news.name != null) {
+                        Text(
+                            text = news.name,
+                            style = MaterialTheme.typography.displaySmall,
+                            color = Color.Black
+                        )
+                    }
+
+                    Text(
+                        text = news.text,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = Color.Black
+                    )
+                }
+            }
+        }
+    }
+
+    /*
     Scaffold(
         containerColor = Color.Gray,
         bottomBar = { BottomPanel { onBackButtonClick() } }
@@ -213,5 +369,5 @@ fun NewsDetails(news: News, onBackButtonClick: () -> Unit) {
                 }
             }
         }
-    }
+    }*/
 }
