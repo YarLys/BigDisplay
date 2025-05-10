@@ -28,6 +28,9 @@ kotlin {
             // Compose
             implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+            // QR Code generator
+            implementation("com.google.zxing:core:3.5.1")
+            implementation("com.google.zxing:javase:3.5.1")
             // Video player
 
             // Navigation

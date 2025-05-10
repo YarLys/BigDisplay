@@ -46,6 +46,8 @@ import org.example.bigdisplayproject.feature.display.network.dto.Attachment
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_TEXT_HEIGHT
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
@@ -97,15 +99,14 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             val attachment = checkAttachments(news)
             if (news.image != null || attachment != null) {
                 Box(
                     modifier = Modifier
-                        .weight(1f)
                         .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.TopCenter
                 ) {
                     var src = ""
                     if (attachment != null) {
@@ -140,17 +141,17 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
             Text(
                 text = news.text,
                 style = MaterialTheme.typography.bodyMedium,
-                maxLines = 3,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
                     .padding(horizontal = 4.dp)
-                    .then(
+                    /*.then(
                         if (hasImage) {
                             Modifier.weight(0.4f)
                         } else {
                             Modifier
                         }
-                    ),
+                    )*/,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -166,29 +167,45 @@ fun checkAttachments(news: News): Attachment? {
     return null
 }
 
+@Composable
 fun getCardHeight(news: News): Dp {
     val attachment = checkAttachments(news)
     if (attachment != null) {
         if (attachment is Photo) {
-            return when {
-                attachment.image.height > attachment.image.width -> 600.dp
-                attachment.image.height == attachment.image.width -> 450.dp
+            /*return when {
+                attachment.image.height > attachment.image.width -> 500.dp
+                attachment.image.height == attachment.image.width -> 400.dp
                 else -> 300.dp
+            }*/
+            //return attachment.image.height.toInt()
+            if ((attachment.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
+                return ((attachment.image.height.toInt() * CARD_WIDTH / attachment.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
             }
+            else return attachment.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
         } else if (attachment is Link) {
-            return when {
-                attachment.image.height > attachment.image.width -> 600.dp
-                attachment.image.height == attachment.image.width -> 450.dp
+            /*return when {
+                attachment.image.height > attachment.image.width -> 500.dp
+                attachment.image.height == attachment.image.width -> 400.dp
                 else -> 300.dp
+            }*/
+            //return attachment.image.height.toInt()
+            if ((attachment.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
+                return ((attachment.image.height.toInt() * CARD_WIDTH / attachment.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
             }
-        } else return 200.dp   // unnecessary
+            else return attachment.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
+        } else return 100.dp   // unnecessary
     } else if (news.image != null) {
-        return when {
-            news.image.height > news.image.width -> 600.dp
-            news.image.height == news.image.width -> 450.dp
+        /*return when {
+            news.image.height > news.image.width -> 500.dp
+            news.image.height == news.image.width -> 400.dp
             else -> 300.dp
+        }*/
+        //return news.image.height.toInt()
+        if ((news.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
+            return ((news.image.height.toInt() * CARD_WIDTH / news.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
         }
-    } else return 200.dp
+        else return news.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
+    } else return 150.dp
 }
 
 

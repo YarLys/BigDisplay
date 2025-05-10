@@ -15,4 +15,9 @@ object Constants {
     const val CARD_DETAIL_PADDING = 50
     const val CARD_DETAIL_BETWEEN = 64
     const val CARD_DETAIL_PADDING_TEXT = 30
+    const val CLOSE_BUTTON_SIZE = 60
+    const val CLOSE_BUTTON_PADDING = 20
+
+    const val CARD_WIDTH = 300
+    const val CARD_TEXT_HEIGHT = 80
 }

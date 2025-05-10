@@ -67,12 +67,12 @@ fun App(client: NewsClient) {
                                     onItemClick = { id ->
                                         navController.navigate(
                                             Route.NewsDetail(id)
-                                        ) {
+                                        ) /*{
                                             popUpTo(Route.NewsList) {
                                                 saveState = true // Сохраняем состояние списка
                                             }
                                             restoreState = true // Восстанавливаем при возврате
-                                        }
+                                        }*/
                                     },
                                     /*isRefreshing = false,
                                     onRefresh = {
@@ -96,9 +96,7 @@ fun App(client: NewsClient) {
                         usePlatformDefaultWidth = false,
                         dismissOnBackPress = true,
                         dismissOnClickOutside = true
-                    )
-                    //enterTransition = { fadeIn() },
-                    //exitTransition = { fadeOut() }
+                    ),
                 ) { entry ->
                     val args = entry.toRoute<Route.NewsDetail>()
 
