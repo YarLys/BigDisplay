@@ -20,4 +20,5 @@ object Constants {
 
     const val CARD_WIDTH = 300
     const val CARD_TEXT_HEIGHT = 80
+    const val NO_IMAGE_CARD_HEIGHT = 150
 }

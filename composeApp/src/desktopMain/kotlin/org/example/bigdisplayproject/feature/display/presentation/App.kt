@@ -1,9 +1,7 @@
 package org.example.bigdisplayproject.feature.display.presentation
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -51,8 +49,7 @@ fun App(client: NewsClient) {
                 startDestination = Route.NewsList
             ) {
                 composable<Route.NewsList> (
-                   // exitTransition = { slideOutHorizontally { it } },
-                   // popEnterTransition = { slideInHorizontally { it } }
+
                 ) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -67,12 +64,12 @@ fun App(client: NewsClient) {
                                     onItemClick = { id ->
                                         navController.navigate(
                                             Route.NewsDetail(id)
-                                        ) /*{
+                                        ) {
                                             popUpTo(Route.NewsList) {
-                                                saveState = true // Сохраняем состояние списка
+                                                saveState = true
                                             }
-                                            restoreState = true // Восстанавливаем при возврате
-                                        }*/
+                                            restoreState = true
+                                        }
                                     },
                                     /*isRefreshing = false,
                                     onRefresh = {
@@ -96,7 +93,7 @@ fun App(client: NewsClient) {
                         usePlatformDefaultWidth = false,
                         dismissOnBackPress = true,
                         dismissOnClickOutside = true
-                    ),
+                    )
                 ) { entry ->
                     val args = entry.toRoute<Route.NewsDetail>()
 

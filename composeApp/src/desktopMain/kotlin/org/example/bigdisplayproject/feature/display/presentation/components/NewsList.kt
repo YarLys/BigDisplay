@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.collectLatest
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.theme.DarkGray
@@ -51,10 +52,14 @@ fun NewsList(
     val listState = rememberLazyStaggeredGridState(
         initialFirstVisibleItemIndex = scrollPosition
     )
-    LaunchedEffect(listState) {
+    /*LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { onScrollPositionChanged(it) }
-    }
+            .collectLatest { index ->
+                if (listState.isScrollInProgress) return@collectLatest
+                onScrollPositionChanged(index)
+            }
+            //.collect { onScrollPositionChanged(it) }
+    }*/
     Scaffold(
         bottomBar = { BottomPanel({ /* todo возврат к меню. будет во 2 версии */  }) }
     ) { paddingValues ->
@@ -91,7 +96,7 @@ fun NewsList(
                 horizontalArrangement = Arrangement.spacedBy(PADDING_BETWEEN_CARDS.pxToDp()),
                 verticalItemSpacing = PADDING_BETWEEN_CARDS.pxToDp()
             ) {
-                items(newsList) { news ->
+                items(items = newsList) { news ->
                     NewsCard(news = news, onItemClick)
                 }
             }

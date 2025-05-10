@@ -112,8 +112,10 @@ fun NewsDetails(
                     horizontalArrangement = Arrangement.spacedBy(CARD_DETAIL_BETWEEN.pxToDp())
                 ) {
 
+                    // маленькое изображение по типу логотипа ИИТ не отображаем. Иначе оно растягивается и качество плохое
                     val attachment = checkAttachments(news)
-                    if (news.image != null || attachment != null) {
+                    if ((news.image != null && !(news.image.width == news.image.height && news.image.height < 400))
+                        || attachment != null) {
                         Column(
                             modifier = Modifier
                                 .weight(1f)
@@ -135,31 +137,36 @@ fun NewsDetails(
                                     state = pagerState,
                                     key = { attachments[it] }
                                 ) { index ->
-                                    AsyncImage(
-                                        model = ImageRequest.Builder(LocalPlatformContext.current)
-                                            .data(
-                                                when (val attachment = attachments[index]) {
-                                                    is Photo -> attachment.image.src
-                                                    is Link -> attachment.image.src
-                                                    else -> ""
-                                                }
-                                            )
-                                            .apply {
-                                                headers {
-                                                    append("User-Agent", "Mozilla/5.0")
-                                                    append("Referer", "https://vk.com/")
-                                                }
-                                            }
-                                            .build(),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Fit,
+                                    Box(
                                         modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(16.dp)),
-                                        onError = { error ->
-                                            println("Ошибка загрузки. Проверьте URL и заголовки.")
-                                        }
-                                    )
+                                            .fillMaxSize()
+                                    ) {
+                                        AsyncImage(
+                                            model = ImageRequest.Builder(LocalPlatformContext.current)
+                                                .data(
+                                                    when (val attachment = attachments[index]) {
+                                                        is Photo -> attachment.image.src
+                                                        is Link -> attachment.image.src
+                                                        else -> ""
+                                                    }
+                                                )
+                                                .apply {
+                                                    headers {
+                                                        append("User-Agent", "Mozilla/5.0")
+                                                        append("Referer", "https://vk.com/")
+                                                    }
+                                                }
+                                                .build(),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Fit,
+                                            modifier = Modifier
+                                                .align(Alignment.Center)
+                                                .clip(RoundedCornerShape(16.dp)),
+                                            onError = { error ->
+                                                println("Ошибка загрузки. Проверьте URL и заголовки.")
+                                            }
+                                        )
+                                    }
                                 }
                             }
                             /*if (attachments.size > 1) {
@@ -246,6 +253,8 @@ fun NewsDetails(
                             style = MaterialTheme.typography.headlineSmall,
                             color = Color.Black
                         )
+
+                        Spacer(modifier = Modifier.height(CARD_DETAIL_PADDING.pxToDp()))
 
                         var attachment: Link? = null
                         for (att in news.attachments) {

@@ -1,11 +1,6 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -19,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,9 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -46,10 +37,11 @@ import org.example.bigdisplayproject.feature.display.network.dto.Attachment
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
+import org.example.bigdisplayproject.feature.display.network.dto.StaticImageData
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_TEXT_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.NO_IMAGE_CARD_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
-import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
 
 @Composable
@@ -58,7 +50,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
     val isHovered by interactionSource.collectIsHoveredAsState()
 
     val cardHeight = getCardHeight(news)
-    val hasImage = cardHeight != 200.dp
+    val hasImage = cardHeight != NO_IMAGE_CARD_HEIGHT.dp
 
     Card(
         modifier = Modifier
@@ -99,7 +91,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = if (hasImage) Arrangement.Top else Arrangement.Center
         ) {
             val attachment = checkAttachments(news)
             if (news.image != null || attachment != null) {
@@ -143,14 +135,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 modifier = Modifier
-                    .padding(horizontal = 4.dp)
-                    /*.then(
-                        if (hasImage) {
-                            Modifier.weight(0.4f)
-                        } else {
-                            Modifier
-                        }
-                    )*/,
+                    .padding(horizontal = 4.dp),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
@@ -169,43 +154,23 @@ fun checkAttachments(news: News): Attachment? {
 
 @Composable
 fun getCardHeight(news: News): Dp {
-    val attachment = checkAttachments(news)
+    var attachment = checkAttachments(news)
     if (attachment != null) {
-        if (attachment is Photo) {
-            /*return when {
-                attachment.image.height > attachment.image.width -> 500.dp
-                attachment.image.height == attachment.image.width -> 400.dp
-                else -> 300.dp
-            }*/
-            //return attachment.image.height.toInt()
-            if ((attachment.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
-                return ((attachment.image.height.toInt() * CARD_WIDTH / attachment.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
-            }
-            else return attachment.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
-        } else if (attachment is Link) {
-            /*return when {
-                attachment.image.height > attachment.image.width -> 500.dp
-                attachment.image.height == attachment.image.width -> 400.dp
-                else -> 300.dp
-            }*/
-            //return attachment.image.height.toInt()
-            if ((attachment.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
-                return ((attachment.image.height.toInt() * CARD_WIDTH / attachment.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
-            }
-            else return attachment.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
-        } else return 100.dp   // unnecessary
-    } else if (news.image != null) {
-        /*return when {
-            news.image.height > news.image.width -> 500.dp
-            news.image.height == news.image.width -> 400.dp
-            else -> 300.dp
-        }*/
-        //return news.image.height.toInt()
-        if ((news.image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
-            return ((news.image.height.toInt() * CARD_WIDTH / news.image.width.toInt()) + CARD_TEXT_HEIGHT).dp
+        return when (attachment) {
+            is Photo -> calculateHeight(attachment.image)
+            is Link -> calculateHeight(attachment.image)
+            else -> 100.dp   // unnecessary
         }
-        else return news.image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
-    } else return 150.dp
+    } else if (news.image != null) {
+        return calculateHeight(news.image)
+    } else return NO_IMAGE_CARD_HEIGHT.dp
+}
+
+@Composable
+fun calculateHeight(image: StaticImageData): Dp {
+    if ((image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
+        return ((image.height.toInt() * CARD_WIDTH / image.width.toInt()) + CARD_TEXT_HEIGHT).dp
+    } else return image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
 }
 
 
