@@ -64,12 +64,12 @@ fun App(client: NewsClient) {
                                     onItemClick = { id ->
                                         navController.navigate(
                                             Route.NewsDetail(id)
-                                        ) {
+                                        ) /*{
                                             popUpTo(Route.NewsList) {
                                                 saveState = true
                                             }
                                             restoreState = true
-                                        }
+                                        }*/
                                     },
                                     /*isRefreshing = false,
                                     onRefresh = {
@@ -82,6 +82,7 @@ fun App(client: NewsClient) {
                                                 position
                                             )
                                         )
+                                        println("SCROLL_POSITION: $position")
                                     }
                                 )
                             }

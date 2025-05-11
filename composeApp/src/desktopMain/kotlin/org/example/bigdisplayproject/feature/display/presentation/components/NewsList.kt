@@ -50,16 +50,14 @@ fun NewsList(
     onScrollPositionChanged: (Int) -> Unit
 ) {
     val listState = rememberLazyStaggeredGridState(
-        initialFirstVisibleItemIndex = scrollPosition
+        //initialFirstVisibleItemIndex = scrollPosition
     )
-    /*LaunchedEffect(listState) {
+    LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
-            .collectLatest { index ->
-                if (listState.isScrollInProgress) return@collectLatest
-                onScrollPositionChanged(index)
+            .collect { index ->
+                //onScrollPositionChanged(index)
             }
-            //.collect { onScrollPositionChanged(it) }
-    }*/
+    }
     Scaffold(
         bottomBar = { BottomPanel({ /* todo возврат к меню. будет во 2 версии */  }) }
     ) { paddingValues ->
