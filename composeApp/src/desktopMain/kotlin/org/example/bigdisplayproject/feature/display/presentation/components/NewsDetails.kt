@@ -1,6 +1,8 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -10,14 +12,11 @@ import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,28 +31,29 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -65,9 +65,6 @@ import org.example.bigdisplayproject.feature.display.network.dto.Attachment
 import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
-import org.example.bigdisplayproject.feature.display.network.dto.StaticImageData
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BACK_BUTTON_HEIGHT
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BACK_BUTTON_WIDTH
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_BETWEEN
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING_TEXT
@@ -75,12 +72,10 @@ import org.example.bigdisplayproject.feature.display.presentation.util.Constants
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CLOSE_BUTTON_PADDING
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CLOSE_BUTTON_SIZE
 import org.example.bigdisplayproject.feature.display.presentation.util.QrCode
-import org.example.bigdisplayproject.feature.display.presentation.util.generateQRCode
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -133,91 +128,24 @@ fun NewsDetails(
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(16.dp))
                             ) {
-                                HorizontalPager(
-                                    state = pagerState,
-                                    key = { attachments[it] }
-                                ) { index ->
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                    ) {
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(LocalPlatformContext.current)
-                                                .data(
-                                                    when (val attachment = attachments[index]) {
-                                                        is Photo -> attachment.image.src
-                                                        is Link -> attachment.image.src
-                                                        else -> ""
-                                                    }
-                                                )
-                                                .apply {
-                                                    headers {
-                                                        append("User-Agent", "Mozilla/5.0")
-                                                        append("Referer", "https://vk.com/")
-                                                    }
-                                                }
-                                                .build(),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier
-                                                .align(Alignment.Center)
-                                                .clip(RoundedCornerShape(16.dp)),
-                                            onError = { error ->
-                                                println("Ошибка загрузки. Проверьте URL и заголовки.")
-                                            }
-                                        )
-                                    }
-                                }
+                                newsDetailsPager(pagerState, attachments)
                             }
-                            /*if (attachments.size > 1) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth(0.3f)
-                                        .clip(RoundedCornerShape(100))
-                                        .background(MaterialTheme.colorScheme.background)
-                                        .padding(8.dp)
-                                        .align(Alignment.CenterHorizontally)
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                pagerState.animateScrollToPage(
-                                                    pagerState.currentPage - 1
-                                                )
-                                            }
-                                        },
-                                        modifier = Modifier.align(Alignment.CenterStart)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                            contentDescription = "Go back"
-                                        )
-                                    }
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                pagerState.animateScrollToPage(
-                                                    pagerState.currentPage + 1
-                                                )
-                                            }
-                                        },
-                                        modifier = Modifier.align(Alignment.CenterEnd)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                            contentDescription = "Go forward"
-                                        )
-                                    }
-                                }
-                            }*/
                         }
                     }
+
+                    val scrollState = rememberScrollState()
+                    val isScrollable = scrollState.maxValue > 0
+                    val scrollbarAlpha by animateFloatAsState(
+                        targetValue = if (isScrollable) 1f else 0f,
+                        animationSpec = tween(durationMillis = 300),
+                        label = "scrollbarAlpha"
+                    )
                     Column(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
                             .padding(CARD_DETAIL_PADDING_TEXT.pxToDp())
-                            .verticalScroll(rememberScrollState())
+                            .verticalScroll(scrollState)
                     ) {
                         val dateTime = Instant.ofEpochSecond(news.date)
                             .atZone(ZoneId.of("Europe/Moscow"))
@@ -280,6 +208,47 @@ fun NewsDetails(
                             }
                         }
                     }
+
+                    if (isScrollable) {
+                        val scrollbarWidth = 8.dp
+                        val scrollbarColor = DarkGray.copy(alpha = 0.5f * scrollbarAlpha)
+                        val thumbColor = DarkGray.copy(alpha = scrollbarAlpha)
+
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(scrollbarWidth + 4.dp)
+                                .align(Alignment.CenterVertically)
+                                .padding(top = 70.dp)
+                        ) {
+                            val scrollbarHeight = size.height
+                            val scrollbarTop = 0f
+
+                            drawRoundRect(
+                                color = scrollbarColor,
+                                topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop),
+                                size = Size(scrollbarWidth.toPx(), scrollbarHeight),
+                                cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
+                            )
+
+                            val visibleHeight = scrollbarHeight
+                            val contentHeight = scrollState.maxValue + visibleHeight
+                            val thumbHeight = (visibleHeight * (visibleHeight / contentHeight))
+                                .coerceAtLeast(32.dp.toPx())
+                                .coerceAtMost(visibleHeight) //
+
+                            val thumbOffset = (scrollState.value * (visibleHeight / contentHeight))
+                                .coerceAtMost(visibleHeight - thumbHeight)
+
+                            drawRoundRect(
+                                color = thumbColor,
+                                topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop + thumbOffset),
+                                size = Size(scrollbarWidth.toPx(), thumbHeight),
+                                cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
+                            )
+                        }
+                    }
+
                 }
 
                 val interactionSource = remember { MutableInteractionSource() }

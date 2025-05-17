@@ -26,7 +26,9 @@ import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.jetbrains.compose.resources.painterResource
 import bigdisplayproject.composeapp.generated.resources.iit_logo
+import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
 import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo
+import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo_svg
 import bigdisplayproject.composeapp.generated.resources.separator
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import java.text.SimpleDateFormat
@@ -67,7 +69,7 @@ fun BottomPanel(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(BOTTOM_PANEL_ICONS_SPACE.pxToDp())
             ) {
-                Image(painterResource(Res.drawable.iit_logo), null)
+                Image(painterResource(Res.drawable.iit_logo_svg), null)
                 Text(
                     text = "Институт Информационных\nТехнологий",
                     style = MaterialTheme.typography.bodyMedium,
@@ -75,7 +77,7 @@ fun BottomPanel(
                     textAlign = TextAlign.Center
                 )
                 Image(painterResource(Res.drawable.separator), null)
-                Image(painterResource(Res.drawable.rtuitlab_logo), null)
+                Image(painterResource(Res.drawable.rtuitlab_logo_svg), null)
                 Text(
                     text = "RTUITLab",
                     style = MaterialTheme.typography.bodyMedium,

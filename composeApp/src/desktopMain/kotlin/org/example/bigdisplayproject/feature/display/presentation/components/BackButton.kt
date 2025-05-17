@@ -1,15 +1,10 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,6 +41,8 @@ fun BackButton(
         )
     ) {
         Row(
+            modifier = Modifier
+                .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -57,7 +54,8 @@ fun BackButton(
             Text(
                 text = "Назад",
                 style = MaterialTheme.typography.bodyMedium,
-                color = DarkGray
+                color = DarkGray,
+                modifier = Modifier.padding(bottom = 1.7.dp)
             )
         }
     }
