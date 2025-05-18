@@ -2,12 +2,14 @@ package org.example.bigdisplayproject.feature.display.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,16 +26,20 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -49,6 +55,7 @@ import org.example.bigdisplayproject.feature.display.presentation.util.Constants
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.feature.display.presentation.util.dpToPx
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
+import org.example.bigdisplayproject.ui.theme.LightWhite
 import kotlin.math.abs
 
 @Composable
@@ -63,10 +70,6 @@ fun newsDetailsPager(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(1.dp)
-                .drawWithContent {
-                    drawContent()
-                }
         ) {
             var src = ""
             var imageHeight = 0
@@ -84,10 +87,8 @@ fun newsDetailsPager(
                 }
                 else -> {}
             }
-            //if (imageHeight.pxToDp() <= CARD_DETAIL_HEIGHT.dp - 70.dp) {
             if (shouldApplyBlur(IntSize(width = imageWidth, height = imageHeight),
                     IntSize(width = CARD_DETAIL_WIDTH / 2, height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()))) { // небольшой нюанс
-                //println(imageHeight)
                 AsyncImage(
                     model = ImageRequest.Builder(LocalPlatformContext.current)
                         .data(src)
@@ -120,7 +121,8 @@ fun newsDetailsPager(
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .clip(RoundedCornerShape(16.dp)),
+                    .clip(RoundedCornerShape(16.dp))
+                    .fillMaxWidth(),
                 onError = { error ->
                     println("Ошибка загрузки. Проверьте URL и заголовки.")
                 }
@@ -144,12 +146,7 @@ fun newsDetailsPager(
                             .align(Alignment.CenterStart)
                             .padding(4.dp)
                             .size(64.dp)
-                            .hoverable(leftInteractionSource)
-                        /*.shadow(
-                            elevation = if (isLeftHovered) 8.dp else 0.dp,
-                            shape = CircleShape,
-                            spotColor = Color.White
-                        )*/,
+                            .hoverable(leftInteractionSource),
                         interactionSource = leftInteractionSource
                     ) {
                         Icon(
@@ -175,12 +172,7 @@ fun newsDetailsPager(
                             .align(Alignment.CenterEnd)
                             .padding(4.dp)
                             .size(64.dp)
-                            .hoverable(rightInteractionSource)
-                        /*.shadow(
-                            elevation = if (isRightHovered) 8.dp else 0.dp,
-                            shape = CircleShape,
-                            spotColor = Color.White
-                        )*/,
+                            .hoverable(rightInteractionSource),
                         interactionSource = rightInteractionSource
                     ) {
                         Icon(
