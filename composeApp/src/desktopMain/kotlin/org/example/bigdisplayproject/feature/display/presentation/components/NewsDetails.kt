@@ -66,6 +66,7 @@ import org.example.bigdisplayproject.feature.display.network.dto.Link
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.network.dto.Photo
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_BETWEEN
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_PADDING_TEXT
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_DETAIL_WIDTH
@@ -91,7 +92,7 @@ fun NewsDetails(
         Card(
             modifier = Modifier
                 .width(CARD_DETAIL_WIDTH.pxToDp())
-                .height(700.dp)
+                .height(CARD_DETAIL_HEIGHT.dp)
                 .align(Alignment.Center),
             colors = CardDefaults.cardColors(
                 containerColor = LightWhite,
@@ -128,6 +129,7 @@ fun NewsDetails(
                                     .fillMaxSize()
                                     .clip(RoundedCornerShape(16.dp))
                             ) {
+                                println()
                                 newsDetailsPager(pagerState, attachments)
                             }
                         }

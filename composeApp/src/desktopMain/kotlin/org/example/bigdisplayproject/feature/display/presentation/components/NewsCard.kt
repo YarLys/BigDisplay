@@ -1,5 +1,6 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -22,13 +24,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import bigdisplayproject.composeapp.generated.resources.Res
+import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
+import bigdisplayproject.composeapp.generated.resources.zaglushka
+import bigdisplayproject.composeapp.generated.resources.zaglushka_svg
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
@@ -40,23 +49,22 @@ import org.example.bigdisplayproject.feature.display.network.dto.Photo
 import org.example.bigdisplayproject.feature.display.network.dto.StaticImageData
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_TEXT_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CUSTOM_IMAGE_HEIGHT
+import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CUSTOM_IMAGE_WIDTH
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.NO_IMAGE_CARD_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
     val isHovered by interactionSource.collectIsHoveredAsState()
 
-    val cardHeight = getCardHeight(news)
-    val hasImage = cardHeight != NO_IMAGE_CARD_HEIGHT.dp
-
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .height(cardHeight)
             .hoverable(interactionSource)
             .shadow(
                 elevation = if (isHovered) 24.dp else 8.dp,
@@ -91,25 +99,58 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = if (hasImage) Arrangement.Top else Arrangement.Center
+            verticalArrangement = Arrangement.Top // if (hasImage) Arrangement.Top else Arrangement.Center
         ) {
-            val attachment = checkAttachments(news)
-            if (news.image != null || attachment != null) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.TopCenter
-                ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                val attachment = checkAttachments(news)
+                if (news.image != null || attachment != null) {
                     var src = ""
+                    var imageWidth = 0
                     if (attachment != null) {
-                        src = when (attachment) {
-                            is Photo -> attachment.image.src
-                            is Link -> attachment.image.src
+                        when (attachment) {
+                            is Photo -> {
+                                src = attachment.image.src
+                                imageWidth = attachment.image.width.toInt()
+                            }
+
+                            is Link -> {
+                                src = attachment.image.src
+                                imageWidth = attachment.image.width.toInt()
+                            }
+
                             else -> {
-                                ""
+                                src = ""
                             } // because here no other options
                         }
-                    } else src = news.image!!.src
+                    } else {
+                        src = news.image!!.src
+                        imageWidth = news.image.width.toInt()
+                    }
+
+                    if (imageWidth.pxToDp() <= (CARD_WIDTH - 30).dp) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalPlatformContext.current)
+                                .data(src)
+                                .apply {
+                                    headers {
+                                        append("User-Agent", "Mozilla/5.0")
+                                        append("Referer", "https://vk.com/")
+                                    }
+                                }
+                                .build(),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .blur(3.dp)
+                                .alpha(0.9f)
+                        )
+                    }
                     AsyncImage(
                         model = ImageRequest.Builder(LocalPlatformContext.current)
                             .data(src)
@@ -121,15 +162,18 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                             }
                             .build(),
                         contentDescription = null,
+                        contentScale = ContentScale.Fit,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp)),
+                            .fillMaxWidth(),
                         onError = { error ->
                             println("Ошибка загрузки. Проверьте URL и заголовки.")
                         }
                     )
-                    Spacer(modifier = Modifier.height((20).pxToDp()))
+                } else {
+                    Image(painterResource(Res.drawable.zaglushka_svg), null)
                 }
             }
+            Spacer(modifier = Modifier.height((20).pxToDp()))
             Text(
                 text = news.text,
                 style = MaterialTheme.typography.bodyMedium,
@@ -150,27 +194,6 @@ fun checkAttachments(news: News): Attachment? {
         }
     }
     return null
-}
-
-@Composable
-fun getCardHeight(news: News): Dp {
-    var attachment = checkAttachments(news)
-    if (attachment != null) {
-        return when (attachment) {
-            is Photo -> calculateHeight(attachment.image)
-            is Link -> calculateHeight(attachment.image)
-            else -> 100.dp   // unnecessary
-        }
-    } else if (news.image != null) {
-        return calculateHeight(news.image)
-    } else return NO_IMAGE_CARD_HEIGHT.dp
-}
-
-@Composable
-fun calculateHeight(image: StaticImageData): Dp {
-    if ((image.width.toInt()).pxToDp() > CARD_WIDTH.dp) {
-        return ((image.height.toInt() * CARD_WIDTH / image.width.toInt()) + CARD_TEXT_HEIGHT).dp
-    } else return image.height.toInt().pxToDp() + CARD_TEXT_HEIGHT.dp + 35.dp
 }
 
 
