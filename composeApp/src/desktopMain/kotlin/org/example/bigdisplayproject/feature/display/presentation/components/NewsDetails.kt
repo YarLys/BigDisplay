@@ -6,6 +6,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
@@ -53,6 +55,7 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -212,45 +215,68 @@ fun NewsDetails(
                     }
 
                     if (isScrollable) {
+                        val scope = rememberCoroutineScope()
                         val scrollbarWidth = 8.dp
                         val scrollbarColor = DarkGray.copy(alpha = 0.5f * scrollbarAlpha)
                         val thumbColor = DarkGray.copy(alpha = scrollbarAlpha)
 
-                        Canvas(
+                        Box(
                             modifier = Modifier
                                 .fillMaxHeight()
                                 .width(scrollbarWidth + 4.dp)
                                 .align(Alignment.CenterVertically)
                                 .padding(top = 70.dp)
+                                .pointerInput(Unit) {
+                                    detectDragGestures { change, dragAmount ->
+                                        val maxHeight = size.height
+                                        val newOffset = (scrollState.value + dragAmount.y * scrollState.maxValue / maxHeight)
+                                            .coerceIn(0f, scrollState.maxValue.toFloat())
+                                        scope.launch {
+                                            scrollState.scrollTo(newOffset.toInt())
+                                        }
+                                    }
+                                }
+                                .pointerInput(Unit) {
+                                    detectTapGestures { offset ->
+                                        val maxHeight = size.height
+                                        val newValue = (offset.y / maxHeight) * scrollState.maxValue
+                                        scope.launch {
+                                            scrollState.scrollTo(newValue.toInt())
+                                        }
+                                    }
+                                }
                         ) {
-                            val scrollbarHeight = size.height
-                            val scrollbarTop = 0f
+                            Canvas(
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                val scrollbarHeight = size.height
+                                val scrollbarTop = 0f
 
-                            drawRoundRect(
-                                color = scrollbarColor,
-                                topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop),
-                                size = Size(scrollbarWidth.toPx(), scrollbarHeight),
-                                cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
-                            )
+                                drawRoundRect(
+                                    color = scrollbarColor,
+                                    topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop),
+                                    size = Size(scrollbarWidth.toPx(), scrollbarHeight),
+                                    cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
+                                )
 
-                            val visibleHeight = scrollbarHeight
-                            val contentHeight = scrollState.maxValue + visibleHeight
-                            val thumbHeight = (visibleHeight * (visibleHeight / contentHeight))
-                                .coerceAtLeast(32.dp.toPx())
-                                .coerceAtMost(visibleHeight) //
+                                val visibleHeight = scrollbarHeight
+                                val contentHeight = scrollState.maxValue + visibleHeight
+                                val thumbHeight = (visibleHeight * (visibleHeight / contentHeight))
+                                    .coerceAtLeast(32.dp.toPx())
+                                    .coerceAtMost(visibleHeight)
 
-                            val thumbOffset = (scrollState.value * (visibleHeight / contentHeight))
-                                .coerceAtMost(visibleHeight - thumbHeight)
+                                val thumbOffset = (scrollState.value * (visibleHeight / contentHeight))
+                                    .coerceAtMost(visibleHeight - thumbHeight)
 
-                            drawRoundRect(
-                                color = thumbColor,
-                                topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop + thumbOffset),
-                                size = Size(scrollbarWidth.toPx(), thumbHeight),
-                                cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
-                            )
+                                drawRoundRect(
+                                    color = thumbColor,
+                                    topLeft = Offset(size.width - scrollbarWidth.toPx(), thumbOffset),
+                                    size = Size(scrollbarWidth.toPx(), thumbHeight),
+                                    cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
+                                )
+                            }
                         }
                     }
-
                 }
 
                 val interactionSource = remember { MutableInteractionSource() }
