@@ -44,8 +44,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -111,7 +113,7 @@ fun NewsDetails(
                     horizontalArrangement = Arrangement.spacedBy(CARD_DETAIL_BETWEEN.pxToDp())
                 ) {
 
-                    // маленькое изображение по типу логотипа ИИТ не отображаем. Иначе оно растягивается и качество плохое
+                    // маленькое изображение по типу логотипа ИИТ не отображаем
                     val attachment = checkAttachments(news)
                     if ((news.image != null && !(news.image.width == news.image.height && news.image.height < 400))
                         || attachment != null) {
@@ -227,14 +229,18 @@ fun NewsDetails(
                                 .align(Alignment.CenterVertically)
                                 .padding(top = 70.dp)
                                 .pointerInput(Unit) {
-                                    detectDragGestures { change, dragAmount ->
-                                        val maxHeight = size.height
-                                        val newOffset = (scrollState.value + dragAmount.y * scrollState.maxValue / maxHeight)
-                                            .coerceIn(0f, scrollState.maxValue.toFloat())
-                                        scope.launch {
-                                            scrollState.scrollTo(newOffset.toInt())
+                                    detectDragGestures(
+                                        onDrag = { change, dragAmount ->
+                                            val maxHeight = size.height
+                                            val sensitivity = 2.5f
+                                            val delta = (dragAmount.y * sensitivity * scrollState.maxValue / maxHeight)
+                                            val newOffset = (scrollState.value + delta)
+                                                .coerceIn(0f, scrollState.maxValue.toFloat())
+                                            scope.launch {
+                                                scrollState.scrollTo(newOffset.toInt())
+                                            }
                                         }
-                                    }
+                                    )
                                 }
                                 .pointerInput(Unit) {
                                     detectTapGestures { offset ->
@@ -292,11 +298,6 @@ fun NewsDetails(
                             color = if (isHovered) DarkGray else LightWhite,
                             shape = CircleShape
                         )
-                        /*.shadow(
-                            elevation = if (isHovered) 8.dp else 0.dp,
-                            shape = CircleShape,
-                            spotColor = Color.Black
-                        )*/
                         .hoverable(interactionSource)
                 ) {
                     Icon(
