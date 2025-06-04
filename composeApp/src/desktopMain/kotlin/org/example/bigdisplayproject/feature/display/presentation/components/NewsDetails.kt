@@ -57,6 +57,8 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -287,18 +289,25 @@ fun NewsDetails(
 
                 val interactionSource = remember { MutableInteractionSource() }
                 val isHovered by interactionSource.collectIsHoveredAsState()
-                IconButton(
-                    onClick = onBackButtonClick,
+                Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(CLOSE_BUTTON_PADDING.pxToDp())
                         .size(CLOSE_BUTTON_SIZE.pxToDp())
+                        .clickable(
+                            interactionSource = interactionSource,
+                            indication = null
+                        ) { onBackButtonClick() }
+                        .background(
+                            color = LightWhite,
+                            shape = CircleShape
+                        )
                         .border(
                             width = if (isHovered) 2.dp else 0.dp,
                             color = if (isHovered) DarkGray else LightWhite,
                             shape = CircleShape
-                        )
-                        .hoverable(interactionSource)
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Close,

@@ -61,7 +61,7 @@ internal class DisplayStoreFactory(
         private fun getNewsById(id: Long) = scope.launch {
             /*val selected = state().news.find { it.id == id }
             selected?.let { dispatch(DisplayStore.Message.NewsSelected(it)) }*/
-            dispatch(DisplayStore.Message.Loading)
+            //dispatch(DisplayStore.Message.Loading)
             val news = newsClient.getNewsById(id)
                 .onSuccess {
                     dispatch(DisplayStore.Message.NewsSelected(it))

@@ -4,14 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -20,7 +18,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collectLatest
 import org.example.bigdisplayproject.feature.display.network.dto.News
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.theme.DarkGray
@@ -45,19 +42,9 @@ import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 @Composable
 fun NewsList(
     newsList: List<News>,
-    onItemClick: (Long) -> Unit,
-    scrollPosition: Int,
-    onScrollPositionChanged: (Int) -> Unit
+    listState: LazyStaggeredGridState,
+    onItemClick: (Long) -> Unit
 ) {
-    val listState = rememberLazyStaggeredGridState(
-        //initialFirstVisibleItemIndex = scrollPosition
-    )
-    LaunchedEffect(listState) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .collect { index ->
-                //onScrollPositionChanged(index)
-            }
-    }
     Scaffold(
         bottomBar = { BottomPanel({ /* todo возврат к меню. будет во 2 версии */  }) }
     ) { paddingValues ->
@@ -88,8 +75,7 @@ fun NewsList(
             LazyVerticalStaggeredGrid(
                 state = listState,
                 columns = StaggeredGridCells.Adaptive(minSize = CARD_WIDTH.dp),
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(horizontal = 80.dp, vertical = 35.dp),
                 horizontalArrangement = Arrangement.spacedBy(PADDING_BETWEEN_CARDS.pxToDp()),
                 verticalItemSpacing = PADDING_BETWEEN_CARDS.pxToDp()
