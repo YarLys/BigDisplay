@@ -11,4 +11,13 @@ sealed interface Route {
 
     @Serializable
     data class NewsDetail(val id: Long): Route
+
+    @Serializable
+    data object Slider: Route
+
+    @Serializable
+    data object Menu: Route
+
+    @Serializable
+    data object Schedule: Route
 }

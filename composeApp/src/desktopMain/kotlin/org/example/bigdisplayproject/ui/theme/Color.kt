@@ -29,3 +29,6 @@ val GradientColor12 = Color(128,128,128)
 val GradientColor13 = Color(136, 136, 136)
 val GradientColor14 = Color(145,145,145)
 val GradientColor15 = Color(153,153,153)
+
+val LinearGradientButton1 = Color(0, 0, 0, 100)
+val LinearGradientButton2 = Color(0, 0, 0, 0)

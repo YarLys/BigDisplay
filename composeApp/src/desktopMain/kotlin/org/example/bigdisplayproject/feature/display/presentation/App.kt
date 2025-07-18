@@ -29,34 +29,57 @@ import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import org.example.bigdisplayproject.feature.display.DisplayStore
-import org.example.bigdisplayproject.feature.display.DisplayStoreFactory
+import org.example.bigdisplayproject.feature.display.NewsStore
+import org.example.bigdisplayproject.feature.display.NewsStoreFactory
+import org.example.bigdisplayproject.feature.display.ScheduleStore
+import org.example.bigdisplayproject.feature.display.ScheduleStoreFactory
 import org.example.bigdisplayproject.feature.display.network.NewsClient
-import org.example.bigdisplayproject.feature.display.presentation.components.NewsDetails
-import org.example.bigdisplayproject.feature.display.presentation.components.NewsList
+import org.example.bigdisplayproject.feature.display.network.ScheduleClient
+import org.example.bigdisplayproject.feature.display.network.dto.schedule.Classroom
+import org.example.bigdisplayproject.feature.display.network.dto.schedule.ScheduleData
+import org.example.bigdisplayproject.feature.display.presentation.menu.Menu
+import org.example.bigdisplayproject.feature.display.presentation.newsdetails.NewsDetails
+import org.example.bigdisplayproject.feature.display.presentation.newslist.NewsList
 import org.example.bigdisplayproject.feature.display.presentation.navigation.Route
+import org.example.bigdisplayproject.feature.display.presentation.schedule.Schedule
+import org.example.bigdisplayproject.feature.display.presentation.slider.Slider
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 @Preview
-fun App(client: NewsClient) {
+fun App(
+    newsClient: NewsClient,
+    scheduleClient: ScheduleClient
+) {
     MaterialTheme {
-        val store = remember {
-            DisplayStoreFactory(storeFactory = DefaultStoreFactory(), client).create()
+        val newsStore = remember {
+            NewsStoreFactory(
+                storeFactory = DefaultStoreFactory(),
+                newsClient
+            ).create()
         }
-        val state by store.stateFlow.collectAsState()
+        val newsState by newsStore.stateFlow.collectAsState()
+
+        val scheduleStore = remember {
+            ScheduleStoreFactory(
+                storeFactory = DefaultStoreFactory(),
+                scheduleClient
+            ).create()
+        }
+        val scheduleState by scheduleStore.stateFlow.collectAsState()
+
         val navController = rememberNavController()
 
         val listState = rememberLazyStaggeredGridState(
-            initialFirstVisibleItemIndex = state.scrollPosition,
-            initialFirstVisibleItemScrollOffset = state.scrollPosition + 1
+            initialFirstVisibleItemIndex = newsState.scrollPosition,
+            initialFirstVisibleItemScrollOffset = newsState.scrollPosition + 1
         )
         LaunchedEffect(listState.isScrollInProgress) {
             snapshotFlow {
                 listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
             }.collect { position ->
-                store.accept(DisplayStore.Intent.UpdateScrollPosition(position.first))
+                newsStore.accept(NewsStore.Intent.UpdateScrollPosition(position.first))
             }
         }
 
@@ -65,35 +88,22 @@ fun App(client: NewsClient) {
             startDestination = Route.NewsGraph
         ) {
             navigation<Route.NewsGraph>(
-                startDestination = Route.NewsList
+                startDestination = Route.Menu
             ) {
-                composable<Route.NewsList> (
-                    enterTransition = {
-                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left)
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right)
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
-                    }
-                ) {
+                composable<Route.NewsList> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         when {
-                            state.isLoading -> CircularProgressIndicator()
-                            state.error != null -> Text("Ошибка: ${state.error}")
+                            newsState.isLoading -> CircularProgressIndicator()
+                            newsState.error != null -> Text("Ошибка: ${newsState.error}")
                             else -> {
                                 NewsList(
-                                    newsList = state.news,
+                                    newsList = newsState.news,
                                     listState = listState,
                                     onItemClick = { id ->
-                                        store.accept(DisplayStore.Intent.GetNewsById(id))  // предзагружаем данные
+                                        newsStore.accept(NewsStore.Intent.GetNewsById(id))  // предзагружаем данные
                                         navController.navigate(Route.NewsDetail(id)) {
                                             popUpTo(Route.NewsList) {
                                                 saveState = true
@@ -101,9 +111,12 @@ fun App(client: NewsClient) {
                                             restoreState = true
                                         }
                                     },
+                                    onButtonClick = {
+                                        navController.navigateUp()
+                                    },
                                     /*isRefreshing = false,
                                     onRefresh = {
-                                        store.accept(DisplayStore.Intent.Refresh)
+                                        store.accept(NewsStore.Intent.Refresh)
                                     },*/
                                 )
                             }
@@ -146,14 +159,14 @@ fun App(client: NewsClient) {
                                 println("SELECTED NEWS_ID: ${args.id}")
                             }   // debug
                             /*LaunchedEffect(args.id) {
-                                store.accept(DisplayStore.Intent.GetNewsById(args.id))
+                                store.accept(NewsStore.Intent.GetNewsById(args.id))
                             }*/
 
-                            if (state.error != null) {
-                                Text("Ошибка: ${state.error}")
-                            } else if (state.isLoading) {
+                            if (newsState.error != null) {
+                                Text("Ошибка: ${newsState.error}")
+                            } else if (newsState.isLoading) {
                                 CircularProgressIndicator()
-                            } else state.selectedNews?.let { news ->
+                            } else newsState.selectedNews?.let { news ->
                                 NewsDetails(
                                     news = news,
                                     onBackButtonClick = {
@@ -164,6 +177,45 @@ fun App(client: NewsClient) {
 
                         }
                     }
+                }
+                composable<Route.Slider>(
+                    // todo: animations
+                ) {
+                    Slider(
+                        onMenuButtonClick = {
+                            navController.navigate(Route.Menu)
+                        }
+                    )
+                }
+                composable<Route.Menu>(
+                    enterTransition = {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    }
+                ) {
+                    Menu(
+                        navController = navController
+                    )
+                }
+                composable<Route.Schedule> {
+                    Schedule(
+                        onBackButtonClick = { navController.navigateUp() },
+                        state = scheduleState,
+                        getSchedule = { name ->
+                            scheduleStore.accept(ScheduleStore.Intent.GetSchedule(name))
+                        },
+                        getCalendarData = { url ->
+                            scheduleStore.accept(ScheduleStore.Intent.DownloadCalendar(url))
+                        }
+                    )
                 }
             }
         }

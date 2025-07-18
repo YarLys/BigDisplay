@@ -36,7 +36,8 @@ import java.util.Date
 
 @Composable
 fun BottomPanel(
-    onBackButtonClick: () -> Unit
+    onButtonClick: () -> Unit,
+    text: String = "Назад"
 ) {
     val currentTime = remember { mutableStateOf(getCurrentTime()) }
     val currentLabel = remember { mutableStateOf(getLabelText(currentTime.value)) }
@@ -63,7 +64,7 @@ fun BottomPanel(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BackButton { onBackButtonClick() }
+            CustomButton(onButtonClick = { onButtonClick() }, text = text)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -137,7 +138,7 @@ private fun getLabelText(time: String): String {  // мб можно улучш�
     else return ""
 }
 
-private fun getCurrentWeek(time: String): String {   // надо переделывать, временное решение
+private fun getCurrentWeek(time: String): String {   // TODO надо переделывать, временное решение
     val dd = time.substring(9, 11).toInt()
     val MM = time.substring(12, 14).toInt()
 

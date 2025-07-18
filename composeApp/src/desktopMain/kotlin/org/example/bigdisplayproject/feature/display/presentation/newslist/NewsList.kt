@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.feature.display.presentation.components
+package org.example.bigdisplayproject.feature.display.presentation.newslist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.dp
-import org.example.bigdisplayproject.feature.display.network.dto.News
+import org.example.bigdisplayproject.feature.display.network.dto.news.News
+import org.example.bigdisplayproject.feature.display.presentation.components.BottomPanel
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.GradientColor1
@@ -43,10 +44,11 @@ import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 fun NewsList(
     newsList: List<News>,
     listState: LazyStaggeredGridState,
-    onItemClick: (Long) -> Unit
+    onItemClick: (Long) -> Unit,
+    onButtonClick: () -> Unit
 ) {
     Scaffold(
-        bottomBar = { BottomPanel({ /* todo возврат к меню. будет во 2 версии */  }) }
+        bottomBar = { BottomPanel(onButtonClick = onButtonClick) }
     ) { paddingValues ->
         Box(
             modifier = Modifier

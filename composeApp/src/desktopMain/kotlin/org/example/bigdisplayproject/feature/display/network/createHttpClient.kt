@@ -8,15 +8,15 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import org.example.bigdisplayproject.feature.display.network.dto.Album
-import org.example.bigdisplayproject.feature.display.network.dto.Attachment
-import org.example.bigdisplayproject.feature.display.network.dto.Doc
-import org.example.bigdisplayproject.feature.display.network.dto.Link
-import org.example.bigdisplayproject.feature.display.network.dto.Photo
-import org.example.bigdisplayproject.feature.display.network.dto.Poll
-import org.example.bigdisplayproject.feature.display.network.dto.Video
+import org.example.bigdisplayproject.feature.display.network.dto.news.Album
+import org.example.bigdisplayproject.feature.display.network.dto.news.Attachment
+import org.example.bigdisplayproject.feature.display.network.dto.news.Doc
+import org.example.bigdisplayproject.feature.display.network.dto.news.Link
+import org.example.bigdisplayproject.feature.display.network.dto.news.Photo
+import org.example.bigdisplayproject.feature.display.network.dto.news.Poll
+import org.example.bigdisplayproject.feature.display.network.dto.news.Video
 
-fun createHttpClient(engine: CIO): HttpClient {
+fun createNewsHttpClient(engine: CIO): HttpClient {
     return HttpClient(engine) {
         install(ContentNegotiation) {
             json(Json {
@@ -34,6 +34,18 @@ fun createHttpClient(engine: CIO): HttpClient {
                         subclass(Poll::class)
                     }
                 }
+            })
+        }
+    }
+}
+
+fun createScheduleHttpClient(engine: CIO): HttpClient {
+    return HttpClient(engine) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                ignoreUnknownKeys = true
+                isLenient = true
             })
         }
     }

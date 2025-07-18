@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.feature.display.presentation.components
+package org.example.bigdisplayproject.feature.display.presentation.newslist
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -32,26 +31,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import bigdisplayproject.composeapp.generated.resources.Res
-import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
-import bigdisplayproject.composeapp.generated.resources.zaglushka
 import bigdisplayproject.composeapp.generated.resources.zaglushka_svg
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import io.ktor.http.headers
-import org.example.bigdisplayproject.feature.display.network.dto.Attachment
-import org.example.bigdisplayproject.feature.display.network.dto.Link
-import org.example.bigdisplayproject.feature.display.network.dto.News
-import org.example.bigdisplayproject.feature.display.network.dto.Photo
-import org.example.bigdisplayproject.feature.display.network.dto.StaticImageData
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_TEXT_HEIGHT
+import org.example.bigdisplayproject.feature.display.network.dto.news.Attachment
+import org.example.bigdisplayproject.feature.display.network.dto.news.Link
+import org.example.bigdisplayproject.feature.display.network.dto.news.News
+import org.example.bigdisplayproject.feature.display.network.dto.news.Photo
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CARD_WIDTH
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CUSTOM_IMAGE_HEIGHT
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.CUSTOM_IMAGE_WIDTH
-import org.example.bigdisplayproject.feature.display.presentation.util.Constants.NO_IMAGE_CARD_HEIGHT
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.jetbrains.compose.resources.painterResource

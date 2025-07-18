@@ -7,7 +7,9 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import io.ktor.client.engine.cio.CIO
 import org.example.bigdisplayproject.feature.display.network.NewsClient
-import org.example.bigdisplayproject.feature.display.network.createHttpClient
+import org.example.bigdisplayproject.feature.display.network.ScheduleClient
+import org.example.bigdisplayproject.feature.display.network.createScheduleHttpClient
+import org.example.bigdisplayproject.feature.display.network.createNewsHttpClient
 import org.example.bigdisplayproject.feature.display.presentation.App
 
 fun main() = application {
@@ -15,12 +17,16 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "BigDisplayProject",
         state = rememberWindowState().apply {
-            placement = WindowPlacement.Maximized
-        }
+            placement = WindowPlacement.Fullscreen
+        },
+        undecorated = true
     ) {
         App(
-            client = remember {
-                NewsClient(createHttpClient(CIO))
+            newsClient = remember {
+                NewsClient(createNewsHttpClient(CIO))
+            },
+            scheduleClient = remember {
+                ScheduleClient(createScheduleHttpClient(CIO))
             }
         )
     }

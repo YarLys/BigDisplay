@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.feature.display.network.dto
+package org.example.bigdisplayproject.feature.display.network.dto.news
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName

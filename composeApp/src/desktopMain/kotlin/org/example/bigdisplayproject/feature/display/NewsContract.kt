@@ -2,9 +2,10 @@ package org.example.bigdisplayproject.feature.display
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.utils.JvmSerializable
-import org.example.bigdisplayproject.feature.display.network.dto.News
+import org.example.bigdisplayproject.feature.display.network.dto.news.News
+import org.example.bigdisplayproject.feature.display.network.dto.schedule.ScheduleData
 
-internal interface DisplayStore : Store<DisplayStore.Intent, DisplayStore.State, Nothing> {
+interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
 
     sealed interface Action {
         class LoadNews(): Action

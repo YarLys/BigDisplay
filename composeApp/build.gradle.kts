@@ -23,6 +23,16 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            // Библиотека для работы с iCalendar
+            implementation("org.mnode.ical4j:ical4j:4.0.0-alpha11")
+
+            // Для работы с датами
+            implementation("joda-time:joda-time:2.12.5")
+
+            // Дата/время для KMP
+            implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+
             implementation(compose.materialIconsExtended) // For icons
             // Material3
             implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")

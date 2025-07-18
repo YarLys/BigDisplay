@@ -1,6 +1,5 @@
 package org.example.bigdisplayproject.feature.display.presentation.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -10,7 +9,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.feature.display.presentation.util.Constants.BACK_BUTTON_HEIGHT
@@ -19,12 +17,13 @@ import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
 
 @Composable
-fun BackButton(
-    onBackButtonClick: () -> Unit
+fun CustomButton(
+    onButtonClick: () -> Unit,
+    text: String = "Назад"
 ) {
 
     Button(
-        onClick = onBackButtonClick,
+        onClick = onButtonClick,
         modifier = Modifier
             .height(BACK_BUTTON_HEIGHT.pxToDp())
             .width(BACK_BUTTON_WIDTH.pxToDp())
@@ -52,7 +51,7 @@ fun BackButton(
                 tint = DarkGray
             )
             Text(
-                text = "Назад",
+                text = text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = DarkGray,
                 modifier = Modifier.padding(bottom = 1.7.dp)
