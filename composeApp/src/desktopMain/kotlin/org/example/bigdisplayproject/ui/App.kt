@@ -74,8 +74,9 @@ fun App() {
             navController = navController,
             startDestination = Route.NewsGraph
         ) {
+            // TODO: Переписать, чтобы было как в ветке Schedule
             navigation<Route.NewsGraph>(
-                startDestination = Route.Menu
+                startDestination = Route.Slider
             ) {
                 composable<Route.NewsList> {
                     Box(

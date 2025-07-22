@@ -49,10 +49,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import org.example.bigdisplayproject.domain.entities.news.Attachment
-import org.example.bigdisplayproject.domain.entities.news.Link
-import org.example.bigdisplayproject.domain.entities.news.News
-import org.example.bigdisplayproject.domain.entities.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Attachment
+import org.example.bigdisplayproject.data.remote.dto.news.Link
+import org.example.bigdisplayproject.data.remote.dto.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.Photo
 import org.example.bigdisplayproject.ui.news.newslist.checkAttachments
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_BETWEEN
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT

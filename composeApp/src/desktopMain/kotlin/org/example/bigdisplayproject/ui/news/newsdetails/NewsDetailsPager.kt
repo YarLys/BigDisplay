@@ -40,9 +40,9 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import io.ktor.http.headers
 import kotlinx.coroutines.launch
-import org.example.bigdisplayproject.domain.entities.news.Attachment
-import org.example.bigdisplayproject.domain.entities.news.Link
-import org.example.bigdisplayproject.domain.entities.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Attachment
+import org.example.bigdisplayproject.data.remote.dto.news.Link
+import org.example.bigdisplayproject.data.remote.dto.news.Photo
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_WIDTH
 import org.example.bigdisplayproject.ui.util.dpToPx

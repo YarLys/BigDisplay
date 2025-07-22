@@ -7,8 +7,8 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.SerializationException
 import org.example.bigdisplayproject.data.remote.ScheduleClient
-import org.example.bigdisplayproject.domain.entities.schedule.RawScheduleData
-import org.example.bigdisplayproject.domain.entities.schedule.ScheduleData
+import org.example.bigdisplayproject.data.remote.dto.schedule.RawScheduleData
+import org.example.bigdisplayproject.data.remote.dto.schedule.ScheduleData
 import org.example.bigdisplayproject.domain.util.NetworkError
 import org.example.bigdisplayproject.domain.util.Result
 import java.io.File

@@ -2,7 +2,7 @@ package org.example.bigdisplayproject.ui.news.store
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.utils.JvmSerializable
-import org.example.bigdisplayproject.domain.entities.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.News
 
 interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
 

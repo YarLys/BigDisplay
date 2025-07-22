@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.unit.dp
-import org.example.bigdisplayproject.domain.entities.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.News
 import org.example.bigdisplayproject.ui.components.BottomPanel
 import org.example.bigdisplayproject.ui.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.theme.DarkGray

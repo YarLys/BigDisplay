@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.domain.entities.news
+package org.example.bigdisplayproject.data.remote.dto.news
 
 import kotlinx.serialization.Polymorphic
 import kotlinx.serialization.SerialName

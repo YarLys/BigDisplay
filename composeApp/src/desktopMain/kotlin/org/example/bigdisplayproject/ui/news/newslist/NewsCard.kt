@@ -38,10 +38,10 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import io.ktor.http.headers
-import org.example.bigdisplayproject.domain.entities.news.Attachment
-import org.example.bigdisplayproject.domain.entities.news.Link
-import org.example.bigdisplayproject.domain.entities.news.News
-import org.example.bigdisplayproject.domain.entities.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Attachment
+import org.example.bigdisplayproject.data.remote.dto.news.Link
+import org.example.bigdisplayproject.data.remote.dto.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.Photo
 import org.example.bigdisplayproject.ui.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite

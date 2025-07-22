@@ -1,7 +1,7 @@
 package org.example.bigdisplayproject.domain.usecases.schedule
 
 import org.example.bigdisplayproject.data.repository.ScheduleRepository
-import org.example.bigdisplayproject.domain.entities.schedule.ScheduleData
+import org.example.bigdisplayproject.data.remote.dto.schedule.ScheduleData
 import org.example.bigdisplayproject.domain.util.NetworkError
 import org.example.bigdisplayproject.domain.util.Result
 

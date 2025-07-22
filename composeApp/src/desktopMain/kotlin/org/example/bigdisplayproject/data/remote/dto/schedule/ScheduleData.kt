@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.domain.entities.schedule
+package org.example.bigdisplayproject.data.remote.dto.schedule
 
 import kotlinx.serialization.Serializable
 

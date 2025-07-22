@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import bigdisplayproject.composeapp.generated.resources.Res
@@ -37,7 +40,8 @@ import java.util.Date
 @Composable
 fun BottomPanel(
     onButtonClick: () -> Unit,
-    text: String = "Назад"
+    text: String = "Назад",
+    icon: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft
 ) {
     val currentTime = remember { mutableStateOf(getCurrentTime()) }
     val currentLabel = remember { mutableStateOf(getLabelText(currentTime.value)) }
@@ -64,7 +68,7 @@ fun BottomPanel(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CustomButton(onButtonClick = { onButtonClick() }, text = text)
+            CustomButton(onButtonClick = { onButtonClick() }, text = text, icon = icon)
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,

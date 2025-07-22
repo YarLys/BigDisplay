@@ -6,7 +6,7 @@ import io.ktor.client.request.parameter
 import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.serialization.SerializationException
 import org.example.bigdisplayproject.data.remote.NewsClient
-import org.example.bigdisplayproject.domain.entities.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.News
 import org.example.bigdisplayproject.domain.util.NetworkError
 import org.example.bigdisplayproject.domain.util.Result
 

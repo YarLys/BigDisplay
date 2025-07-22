@@ -8,13 +8,16 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
-import org.example.bigdisplayproject.domain.entities.news.Album
-import org.example.bigdisplayproject.domain.entities.news.Attachment
-import org.example.bigdisplayproject.domain.entities.news.Doc
-import org.example.bigdisplayproject.domain.entities.news.Link
-import org.example.bigdisplayproject.domain.entities.news.Photo
-import org.example.bigdisplayproject.domain.entities.news.Poll
-import org.example.bigdisplayproject.domain.entities.news.Video
+import org.example.bigdisplayproject.data.remote.dto.news.Album
+import org.example.bigdisplayproject.data.remote.dto.news.Attachment
+import org.example.bigdisplayproject.data.remote.dto.news.Doc
+import org.example.bigdisplayproject.data.remote.dto.news.Link
+import org.example.bigdisplayproject.data.remote.dto.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Poll
+import org.example.bigdisplayproject.data.remote.dto.news.Video
+import org.example.bigdisplayproject.data.remote.dto.slider.MediaContent
+import org.example.bigdisplayproject.data.remote.dto.slider.SlideImage
+import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
 
 fun createNewsHttpClient(engine: CIO): HttpClient {
     return HttpClient(engine) {
@@ -46,6 +49,24 @@ fun createScheduleHttpClient(engine: CIO): HttpClient {
                 prettyPrint = true
                 ignoreUnknownKeys = true
                 isLenient = true
+            })
+        }
+    }
+}
+
+fun createSliderHttpClient(engine: CIO): HttpClient {
+    return HttpClient(engine) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+                classDiscriminator = "type"
+                serializersModule = SerializersModule {
+                    polymorphic(MediaContent::class) {
+                        subclass(SlideImage::class)
+                        subclass(SlideVideo::class)
+                    }
+                }
             })
         }
     }
