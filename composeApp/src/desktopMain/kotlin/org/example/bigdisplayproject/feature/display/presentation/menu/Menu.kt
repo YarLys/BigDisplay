@@ -175,24 +175,24 @@ fun MenuCard(
             .graphicsLayer {
                 scaleY = scale
                 transformOrigin = TransformOrigin(0.5f, 0.5f)
-                shape = RoundedCornerShape(24.dp)
+                shape = RoundedCornerShape(30.dp)
                 clip = true
             }
             .shadow(
-                elevation = if (isHovered) 24.dp else 8.dp,
-                shape = RoundedCornerShape(24.dp),
+                elevation = if (isHovered) 30.dp else 8.dp,
+                shape = RoundedCornerShape(30.dp),
                 spotColor = if (isHovered) Color.White else Color.Black,
                 ambientColor = if (isHovered) Color.White.copy(alpha = 0.7f) else Color.Black
             )
             .shadow(
-                elevation = if (isHovered) 24.dp else 0.dp,
-                shape = RoundedCornerShape(24.dp),
+                elevation = if (isHovered) 30.dp else 0.dp,
+                shape = RoundedCornerShape(30.dp),
                 spotColor = Color.White.copy(0.9f),
                 ambientColor = Color.White.copy(alpha = 0.4f)
             )
             .shadow(
-                elevation = if (isHovered) 24.dp else 0.dp,
-                shape = RoundedCornerShape(24.dp),
+                elevation = if (isHovered) 30.dp else 0.dp,
+                shape = RoundedCornerShape(30.dp),
                 spotColor = Color.Cyan.copy(alpha = 0.9f),
                 ambientColor = Color.Cyan.copy(alpha = 0.7f)
             )
@@ -200,7 +200,7 @@ fun MenuCard(
                 interactionSource = interactionSource,
                 indication = null
             ) { onCardClick() },
-        shape = RoundedCornerShape(24.dp),
+        shape = RoundedCornerShape(30.dp),
         colors = CardDefaults.cardColors(
             containerColor = LightWhite,
             contentColor = MaterialTheme.colorScheme.onSurface

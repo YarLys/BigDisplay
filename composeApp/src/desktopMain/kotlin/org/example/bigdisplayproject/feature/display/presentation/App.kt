@@ -35,7 +35,6 @@ import org.example.bigdisplayproject.feature.display.ScheduleStore
 import org.example.bigdisplayproject.feature.display.ScheduleStoreFactory
 import org.example.bigdisplayproject.feature.display.network.NewsClient
 import org.example.bigdisplayproject.feature.display.network.ScheduleClient
-import org.example.bigdisplayproject.feature.display.network.dto.schedule.Classroom
 import org.example.bigdisplayproject.feature.display.network.dto.schedule.ScheduleData
 import org.example.bigdisplayproject.feature.display.presentation.menu.Menu
 import org.example.bigdisplayproject.feature.display.presentation.newsdetails.NewsDetails
@@ -214,6 +213,12 @@ fun App(
                         },
                         getCalendarData = { url ->
                             scheduleStore.accept(ScheduleStore.Intent.DownloadCalendar(url))
+                        },
+                        parseCalendar = { calendarData ->
+                            scheduleStore.accept(ScheduleStore.Intent.ParseCalendar(calendarData))
+                        },
+                        getEvents = { events, date ->
+                            scheduleStore.accept(ScheduleStore.Intent.GetEvents(events, date))
                         }
                     )
                 }

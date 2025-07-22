@@ -114,7 +114,7 @@ fun BottomPanel(
 }
 
 private fun getCurrentTime(): String {
-    val sdf = SimpleDateFormat("HH:mm:ss dd-MM-yyyy")
+    val sdf = SimpleDateFormat("HH:mm:ss dd.MM.yyyy")
     return sdf.format(Date())
 }
 

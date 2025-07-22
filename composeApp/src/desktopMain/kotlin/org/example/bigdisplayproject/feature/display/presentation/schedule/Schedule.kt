@@ -1,8 +1,10 @@
 package org.example.bigdisplayproject.feature.display.presentation.schedule
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,9 +14,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -45,10 +51,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDate
 import org.example.bigdisplayproject.feature.display.ScheduleStore
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.style.TextAlign
+import kotlinx.coroutines.delay
+import kotlinx.datetime.LocalDateTime
+import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarEvent
 import org.example.bigdisplayproject.feature.display.network.dto.schedule.ScheduleData
 import org.example.bigdisplayproject.feature.display.presentation.components.BottomPanel
 import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarParser
-import org.example.bigdisplayproject.feature.display.domain.schedule.getEvents
 import org.example.bigdisplayproject.feature.display.presentation.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.GradientColor1
@@ -70,16 +99,26 @@ import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton1
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton2
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun Schedule(
     onBackButtonClick: () -> Unit,
     state: ScheduleStore.State,
     getSchedule: (String) -> Unit,
-    getCalendarData: (String) -> Unit
+    getCalendarData: (String) -> Unit,
+    parseCalendar: (String) -> Unit,
+    getEvents: (List<CalendarEvent>, LocalDate) -> Unit
 ) {
-    val scheduleData = remember { mutableStateOf(ScheduleData(-1, "", "", 0, "", "", "", "")) }
     val group = remember { mutableStateOf("") }
+
+    val sdf = SimpleDateFormat("dd.MM.yyyy")
+    var currentDate by remember { mutableStateOf(ZonedDateTime.now(ZoneId.of("Europe/Moscow"))) }
 
     LaunchedEffect(group.value) {
         if (group.value.length == 10) {  // получаем расписание, как только введено название группы
@@ -184,10 +223,10 @@ fun Schedule(
                     modifier = Modifier
                         .weight(1f)
                         .padding(
-                            top = (84).pxToDp(),
-                            bottom = (277).pxToDp(),
-                            end = (88).pxToDp()
+                            top = (76).pxToDp()
                         )
+                        .padding(8.dp),
+                    contentAlignment = Alignment.Center
                 ) {
                     when {
                         state.isLoading -> CircularProgressIndicator()
@@ -195,23 +234,180 @@ fun Schedule(
                         state.scheduleData != null && state.calendarData == null -> {   // получили ответ от Api по названию группы
                             getCalendarData(state.scheduleData.iCalLink)
                         }
-                        state.calendarData != null -> {   // скачали iCal файл с расписанием
-                            val parser = CalendarParser()
-                            parser.parseCalendar(state.calendarData)
+                        state.calendarData != null && state.events == null -> {   // скачали iCal файл с расписанием
+                            parseCalendar(state.calendarData)  // Парсим полученные данные о расписании
 
-                            val events = getEvents(parser.events, LocalDate(2025, 4, 7))
+                            // Затем, здесь можно будет добавить новую ветку в when, которая будет уже отображать lazycolumn
+                            // с событиями из state. Возможно ещё обрабатывать нажатия клавиш внизу, которые будут менять день
+                            // для просмотра расписания, посылать intent в store, чтобы снова вызвать getEvents в store.
+                            // При смене названия, изменится состояние, и пропадет старое расписание. При смене дня будет обновляться список
+                            // events для отображения.
+                        }
+                        state.events != null && state.filteredEvents == null -> {
                             File("DateSchedule.txt").printWriter().use { out ->
-                                for (event in events) {
+                                for (event in state.events) {
                                     out.println("${event.summary} ${event.description} ${event.location}")
                                 }
                             }
+
+                            // Выбираем события для выбранной даты
+                            //getEvents(state.events, LocalDate(2025, 4, 8))
+
+                            getEvents(state.events, LocalDate(currentDate.year, currentDate.month, currentDate.dayOfMonth))
+                        }
+                        state.filteredEvents != null -> {
+                            LazyColumn(
+                                modifier = Modifier.padding(bottom = (269).pxToDp(), end = (80).pxToDp())
+                            ) {
+                                items(state.filteredEvents) { event ->
+                                    ScheduleCard(event)
+                                }
+                            }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = (774).pxToDp(), bottom = (126).pxToDp(), start = (63).pxToDp()),
+                                horizontalArrangement = Arrangement.spacedBy((32).pxToDp())
+                            ) {
+                                val interactionSource = remember { MutableInteractionSource() }
+
+                                // В этом решении иконка внутри box не центрируется относительно своего "рисунка", а делает это по границам
+                                // Пока что решено просто её сдвинуть. Проблема в самой иконке почему-то, либо я чего-то не понимаю.
+                                Box(
+                                    modifier = Modifier
+                                        .size((80).pxToDp())
+                                        .background(
+                                            color = LightWhite,
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                        .clickable(
+                                            interactionSource = interactionSource,
+                                            indication = null
+                                        ) {
+                                            currentDate = currentDate.minusDays(1)
+
+                                            if (state.events != null) {
+                                                getEvents(
+                                                    state.events,
+                                                    LocalDate(
+                                                        currentDate.year,
+                                                        currentDate.month,
+                                                        currentDate.dayOfMonth
+                                                    )
+                                                )
+                                            }
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
+                                        contentDescription = "Previous date",
+                                        tint = DarkGray,
+                                        modifier = Modifier
+                                            .offset(x = 3.dp)
+                                    )
+                                }
+
+                                Card(
+                                    modifier = Modifier
+                                        .width((400).pxToDp())
+                                        .height((105).pxToDp()),
+                                    shape = RoundedCornerShape(45.dp),
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(
+                                                color = LightWhite
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        val date = DateTimeFormatter
+                                            .ofPattern("dd.MM.yyyy")
+                                            .format(currentDate)
+                                        Text(
+                                            text = date,
+                                            color = DarkGray,
+                                            fontSize = 40.sp
+                                        )
+                                    }
+                                }
+
+                                Box(
+                                    modifier = Modifier
+                                        .size((80).pxToDp())
+                                        .background(
+                                            color = LightWhite,
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                        .clickable(
+                                            interactionSource = interactionSource,
+                                            indication = null
+                                        ) {
+                                            currentDate = currentDate.plusDays(1)
+
+                                            if (state.events != null)
+                                                getEvents(state.events, LocalDate(currentDate.year, currentDate.month, currentDate.dayOfMonth))
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                        contentDescription = "Next date",
+                                        tint = DarkGray
+                                    )
+                                }
+
+                                /*IconButton(
+                                    onClick = {
+                                        val calendar = Calendar.getInstance().apply {
+                                            time = currentDate
+                                            add(Calendar.DAY_OF_YEAR, 1)
+                                        }
+                                        currentDate = calendar.time
+                                    },
+                                    modifier = Modifier
+                                        .size((80).pxToDp())
+                                        .background(
+                                            color = LightWhite,
+                                            shape = RoundedCornerShape(50)
+                                        )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                                        contentDescription = "Next date",
+                                        tint = DarkGray
+                                    )
+                                }*/
+                            }
+                        }
+                        group.value.length == 10 -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = (50).pxToDp(), start = (30).pxToDp(), bottom = (22).pxToDp(), end = (50).pxToDp()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "События не найдены!",
+                                    color = LightWhite,
+                                    fontSize = 36.sp
+                                )
+                            }
                         }
                         else -> {
-                            Text(
-                                text = "Введите название группы",
-                                color = LightWhite,
-                                fontSize = 40.sp
-                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = (50).pxToDp(), start = (30).pxToDp(), bottom = (22).pxToDp(), end = (50).pxToDp()),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "Введите название группы",
+                                    color = LightWhite,
+                                    fontSize = 36.sp
+                                )
+                            }
                         }
                     }
                 }
