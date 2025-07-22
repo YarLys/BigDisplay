@@ -63,8 +63,8 @@ kotlin {
             implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
             implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
             // Koin (DI)
-            //implementation("io.insert-koin:koin-core:3.6.0")
-            //implementation("io.insert-koin:koin-compose:3.6.0")
+            implementation("io.insert-koin:koin-core:3.5.6")
+            implementation("io.insert-koin:koin-compose:1.1.0")
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
