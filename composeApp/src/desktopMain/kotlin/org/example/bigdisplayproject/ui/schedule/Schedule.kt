@@ -55,7 +55,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarEvent
+import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
 import org.example.bigdisplayproject.ui.components.BottomPanel
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
@@ -78,7 +78,6 @@ import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton1
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton2
 import java.io.File
-import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter

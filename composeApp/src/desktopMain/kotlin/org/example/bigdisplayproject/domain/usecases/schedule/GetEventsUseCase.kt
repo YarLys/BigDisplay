@@ -1,4 +1,4 @@
-package org.example.bigdisplayproject.feature.display.domain.schedule
+package org.example.bigdisplayproject.domain.usecases.schedule
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -24,7 +24,8 @@ fun getEvents(
             // Совпал день недели события и четность недель у обеих дат
             // А также проверили, что событие входит в обычное расписание (1-16 недели)
             if (event.start.dayOfWeek == date.dayOfWeek && getWeekNumber(event.start.date) <= 16
-                && getWeekNumber(date) <= 16 && !checkExDate(event.exDates, date)) {
+                && getWeekNumber(date) <= 16 && !checkExDate(event.exDates, date)
+            ) {
                 val dateParity = getParity(date)
                 if (dateParity == event.parityOfWeek) {
                     dateEvents.add(event)

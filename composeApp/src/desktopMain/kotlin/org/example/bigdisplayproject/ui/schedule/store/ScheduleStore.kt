@@ -4,10 +4,9 @@ import com.arkivanov.mvikotlin.core.store.*
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
-import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarEvent
-import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarParser
-import org.example.bigdisplayproject.feature.display.domain.schedule.getEvents
-import org.example.bigdisplayproject.data.remote.api.ScheduleApi
+import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
+import org.example.bigdisplayproject.domain.usecases.schedule.CalendarParser
+import org.example.bigdisplayproject.domain.usecases.schedule.getEvents
 import org.example.bigdisplayproject.domain.usecases.schedule.ScheduleUseCases
 import org.example.bigdisplayproject.domain.util.onError
 import org.example.bigdisplayproject.domain.util.onSuccess

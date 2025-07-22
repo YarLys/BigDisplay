@@ -3,7 +3,7 @@ package org.example.bigdisplayproject.ui.schedule.store
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.utils.JvmSerializable
 import kotlinx.datetime.LocalDate
-import org.example.bigdisplayproject.feature.display.domain.schedule.CalendarEvent
+import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
 import org.example.bigdisplayproject.domain.entities.schedule.ScheduleData
 
 interface ScheduleStore : Store<ScheduleStore.Intent, ScheduleStore.State, Nothing> {

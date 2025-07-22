@@ -1,9 +1,8 @@
-package org.example.bigdisplayproject.feature.display.domain.schedule
+package org.example.bigdisplayproject.domain.usecases.schedule
 
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import java.io.FileOutputStream
-import java.time.format.DateTimeFormatter
 import java.time.temporal.WeekFields
 
 data class CalendarEvent(
