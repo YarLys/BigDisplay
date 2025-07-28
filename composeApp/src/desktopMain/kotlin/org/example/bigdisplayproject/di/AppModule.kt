@@ -19,6 +19,7 @@ import org.example.bigdisplayproject.domain.usecases.schedule.ScheduleUseCases
 import org.example.bigdisplayproject.domain.usecases.slider.GetSlidesUseCase
 import org.example.bigdisplayproject.ui.news.store.NewsStoreFactory
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStoreFactory
+import org.example.bigdisplayproject.ui.slider.store.SliderStoreFactory
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -56,6 +57,13 @@ val koinModule = module {
         ScheduleStoreFactory(
             storeFactory = DefaultStoreFactory(),
             scheduleUseCases = get()
+        ).create()
+    }
+
+    single {
+        SliderStoreFactory(
+            storeFactory = DefaultStoreFactory(),
+            getSlidesUseCase = get()
         ).create()
     }
 

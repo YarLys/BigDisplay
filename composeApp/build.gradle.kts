@@ -26,10 +26,8 @@ kotlin {
 
             // Библиотека для работы с iCalendar
             implementation("org.mnode.ical4j:ical4j:4.0.0-alpha11")
-
             // Для работы с датами
             implementation("joda-time:joda-time:2.12.5")
-
             // Дата/время для KMP
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 

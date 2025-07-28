@@ -47,7 +47,6 @@ import androidx.navigation.NavController
 import bigdisplayproject.composeapp.generated.resources.Res
 import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
 import org.example.bigdisplayproject.ui.components.BottomPanel
-import org.example.bigdisplayproject.ui.components.myShadow
 import org.example.bigdisplayproject.ui.navigation.Route
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray

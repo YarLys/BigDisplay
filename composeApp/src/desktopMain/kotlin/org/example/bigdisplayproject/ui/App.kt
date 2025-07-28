@@ -37,6 +37,7 @@ import org.example.bigdisplayproject.ui.news.newslist.NewsList
 import org.example.bigdisplayproject.ui.navigation.Route
 import org.example.bigdisplayproject.ui.schedule.Schedule
 import org.example.bigdisplayproject.ui.slider.Slider
+import org.example.bigdisplayproject.ui.slider.store.SliderStore
 import org.koin.compose.getKoin
 import org.koin.core.context.startKoin
 
@@ -56,8 +57,10 @@ fun App() {
         val scheduleStore: ScheduleStore = getKoin().get()
         val scheduleState by scheduleStore.stateFlow.collectAsState()
 
-        val navController = rememberNavController()
+        val sliderStore: SliderStore = getKoin().get()
+        val sliderState by sliderStore.stateFlow.collectAsState()
 
+        val navController = rememberNavController()
         val listState = rememberLazyStaggeredGridState(
             initialFirstVisibleItemIndex = newsState.scrollPosition,
             initialFirstVisibleItemScrollOffset = newsState.scrollPosition + 1
@@ -78,6 +81,52 @@ fun App() {
             navigation<Route.NewsGraph>(
                 startDestination = Route.Slider
             ) {
+                composable<Route.Menu>(
+                    enterTransition = {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left)
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
+                    }
+                ) {
+                    Menu(
+                        navController = navController
+                    )
+                }
+                composable<Route.Slider>(
+                    // todo: animations
+                ) {
+                    Slider(
+                        state = sliderState,
+                        onMenuButtonClick = {
+                            navController.navigate(Route.Menu)
+                        }
+                    )
+                }
+                composable<Route.Schedule> {
+                    Schedule(
+                        state = scheduleState,
+                        onBackButtonClick = { navController.navigateUp() },
+                        getSchedule = { name ->
+                            scheduleStore.accept(ScheduleStore.Intent.GetSchedule(name))
+                        },
+                        getCalendarData = { url ->
+                            scheduleStore.accept(ScheduleStore.Intent.DownloadCalendar(url))
+                        },
+                        parseCalendar = { calendarData ->
+                            scheduleStore.accept(ScheduleStore.Intent.ParseCalendar(calendarData))
+                        },
+                        getEvents = { events, date ->
+                            scheduleStore.accept(ScheduleStore.Intent.GetEvents(events, date))
+                        }
+                    )
+                }
                 composable<Route.NewsList> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -165,51 +214,6 @@ fun App() {
 
                         }
                     }
-                }
-                composable<Route.Slider>(
-                    // todo: animations
-                ) {
-                    Slider(
-                        onMenuButtonClick = {
-                            navController.navigate(Route.Menu)
-                        }
-                    )
-                }
-                composable<Route.Menu>(
-                    enterTransition = {
-                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left)
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Left)
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Right)
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Right)
-                    }
-                ) {
-                    Menu(
-                        navController = navController
-                    )
-                }
-                composable<Route.Schedule> {
-                    Schedule(
-                        onBackButtonClick = { navController.navigateUp() },
-                        state = scheduleState,
-                        getSchedule = { name ->
-                            scheduleStore.accept(ScheduleStore.Intent.GetSchedule(name))
-                        },
-                        getCalendarData = { url ->
-                            scheduleStore.accept(ScheduleStore.Intent.DownloadCalendar(url))
-                        },
-                        parseCalendar = { calendarData ->
-                            scheduleStore.accept(ScheduleStore.Intent.ParseCalendar(calendarData))
-                        },
-                        getEvents = { events, date ->
-                            scheduleStore.accept(ScheduleStore.Intent.GetEvents(events, date))
-                        }
-                    )
                 }
             }
         }

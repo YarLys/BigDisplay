@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
+/*
 @Composable
 fun Modifier.myShadow(
     color: Color = Color.Black,
@@ -30,10 +31,12 @@ fun Modifier.myShadow(
             val rightPixel = (this.size.width + spreadPixel)
             val bottomPixel = (this.size.height + spreadPixel)
 
-            /*if (blurRadius != 0.dp) {
+            */
+/*if (blurRadius != 0.dp) {
                 frameworkPaint.maskFilter =
                     (BlurMaskFilter(blurRadius.toPx(), BlurMaskFilter.Blur.NORMAL))
-            }*/
+            }*//*
+
 
             frameworkPaint.color = color.toArgb()
             it.drawRoundRect(
@@ -47,4 +50,4 @@ fun Modifier.myShadow(
             )
         }
     }
-)
+)*/

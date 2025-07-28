@@ -1,6 +1,7 @@
 package org.example.bigdisplayproject.domain.util
 
 enum class NetworkError : Error {
+    WRONG_NAME,
     WRONG_FORMAT,
     NOT_FOUND,
     NO_INTERNET,

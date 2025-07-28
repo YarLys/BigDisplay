@@ -4,10 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
+@SerialName("image")
 data class SlideImage(
     @SerialName("image_type") override val type: String = "image",
-    val src: String,
-    val width: Long,
-    val height: Long,
-    val hover_media_content: Boolean
+    @SerialName("image") val image: ImageContent,
+    @SerialName("hover_media_content") override val hover_media_content: Boolean
 ): MediaContent()

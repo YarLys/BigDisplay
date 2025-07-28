@@ -470,10 +470,11 @@ fun ButtonGrid(
 
 @Composable
 fun GradientBox(
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .drawWithCache {
                 val gradient = Brush.radialGradient(

@@ -13,6 +13,7 @@ val Violet = Color(0xffcf94da)
 val LightGreen = Color(0xffe7ed9b)
 
 val LightWhite = Color(226, 226, 226)
+val White2 = Color(217, 217, 217)
 val DarkGray = Color(51, 51, 51)
 val GradientColor1 = Color(53, 53, 53)
 val GradientColor2 = Color(57, 57, 57)

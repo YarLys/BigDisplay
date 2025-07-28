@@ -9,6 +9,8 @@ import kotlinx.serialization.SerializationException
 import org.example.bigdisplayproject.data.remote.ScheduleClient
 import org.example.bigdisplayproject.data.remote.dto.schedule.RawScheduleData
 import org.example.bigdisplayproject.data.remote.dto.schedule.ScheduleData
+import org.example.bigdisplayproject.domain.util.CustomError
+import org.example.bigdisplayproject.domain.util.Error
 import org.example.bigdisplayproject.domain.util.NetworkError
 import org.example.bigdisplayproject.domain.util.Result
 import java.io.File
@@ -34,8 +36,14 @@ class ScheduleApi (
 
         return when(response.status.value) {
             in 200..299 -> {
-                val scheduleData = response.body<RawScheduleData>().data[0]
-                Result.Success(scheduleData)
+                val rawData = response.body<RawScheduleData>()
+                if (rawData.data.isEmpty()) {
+                    Result.Error(NetworkError.WRONG_NAME)
+                }
+                else {
+                    val scheduleData = response.body<RawScheduleData>().data[0]
+                    Result.Success(scheduleData)
+                }
             }
             400 -> Result.Error(NetworkError.WRONG_FORMAT)
             404 -> Result.Error(NetworkError.NOT_FOUND)

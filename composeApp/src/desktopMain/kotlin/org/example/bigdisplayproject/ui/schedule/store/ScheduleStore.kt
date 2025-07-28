@@ -8,6 +8,7 @@ import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
 import org.example.bigdisplayproject.domain.usecases.schedule.CalendarParser
 import org.example.bigdisplayproject.domain.usecases.schedule.getEvents
 import org.example.bigdisplayproject.domain.usecases.schedule.ScheduleUseCases
+import org.example.bigdisplayproject.domain.util.NetworkError
 import org.example.bigdisplayproject.domain.util.onError
 import org.example.bigdisplayproject.domain.util.onSuccess
 
@@ -59,7 +60,8 @@ internal class ScheduleStoreFactory(
                 }
                 .onError {
                     println("ERROR: ${it.toString()}")
-                    dispatch(ScheduleStore.Message.Error(it.toString()))
+                    if (it == NetworkError.WRONG_NAME) dispatch(ScheduleStore.Message.Error("Неверное название группы"))
+                    else dispatch(ScheduleStore.Message.Error(it.toString()))
                 }
         }
 
