@@ -1,5 +1,11 @@
 package org.example.bigdisplayproject.ui.slider
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,9 +34,11 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +48,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideLink
 import org.example.bigdisplayproject.ui.theme.DarkGray
@@ -52,7 +62,8 @@ import java.util.Locale
 @Composable
 fun LinksBlock(
     slideData: SlideData,
-    onNewsLinkClick: (Long) -> Unit
+    onNewsLinkClick: (Long) -> Unit,
+    onScheduleLinkClick: () -> Unit
 ) {
     var showQrDialog by remember { mutableStateOf(false) }
     var selectedLink by remember { mutableStateOf<SlideLink?>(null) }
@@ -69,6 +80,9 @@ fun LinksBlock(
                 // TODO: Проверить переход на экран новостей и выбор новости с этим id
                 onNewsLinkClick(slideData.keyValue[0].value)
             }
+        }
+        else if (selectedLink != null && selectedLink!!.link.contains("schedule")) {
+            onScheduleLinkClick()
         }
         else {
             LinkQrCode(
@@ -148,66 +162,96 @@ fun LinkQrCode(
     link: SlideLink,
     onDismissRequest: () -> Unit
 ) {
-    Dialog(onDismissRequest = { onDismissRequest() }) {
-        Card(    // TODO: нужно добавить кнопку-крестик для закрытия
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(365.dp)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
+    var visible by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+
+    Dialog(
+        onDismissRequest = {
+            visible = false
+            coroutineScope.launch {
+                delay(300)
+            }
+            onDismissRequest()
+        }
+    ) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(animationSpec = tween(300)) +
+                    scaleIn(initialScale = 0.9f, animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300)) +
+                    scaleOut(targetScale = 0.9f, animationSpec = tween(300))
         ) {
-            Column (
+            Card(
                 modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .height(365.dp)
+                    .padding(16.dp),
+                shape = RoundedCornerShape(16.dp),
             ) {
-                val interactionSource = remember { MutableInteractionSource() }
-                val isHovered by interactionSource.collectIsHoveredAsState()
-                Box(
+                Column(
                     modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(top = 6.dp, end = 10.dp)
-                        .size(30.dp)
-                        .clickable(
-                            interactionSource = interactionSource,
-                            indication = null
-                        ) { onDismissRequest() }
-                        .background(
-                            color = LightWhite,
-                            shape = CircleShape
-                        )
-                        .border(
-                            width = if (isHovered) 2.dp else 0.dp,
-                            color = if (isHovered) DarkGray else LightWhite,
-                            shape = CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = "Закрыть",
-                        tint = DarkGray,
-                        modifier = Modifier.size(22.dp)
+                    val interactionSource = remember { MutableInteractionSource() }
+                    val isHovered by interactionSource.collectIsHoveredAsState()
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 10.dp)
+                            .size(30.dp)
+                            .clickable(
+                                interactionSource = interactionSource,
+                                indication = null
+                            ) {
+                                visible = false
+                                coroutineScope.launch {
+                                    delay(300)
+                                }
+                                onDismissRequest()
+                            }
+                            .background(
+                                color = LightWhite,
+                                shape = CircleShape
+                            )
+                            .border(
+                                width = if (isHovered) 2.dp else 0.dp,
+                                color = if (isHovered) DarkGray else LightWhite,
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Закрыть",
+                            tint = DarkGray,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+
+                    QrCode(
+                        src = link.link,
+                        width = 300,
+                        height = 300,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(top = 4.dp)
+                    )
+                    Text(
+                        text = link.text,
+                        modifier = Modifier
+                            .wrapContentSize(Alignment.Center)
+                            .padding(top = 10.dp),
+                        textAlign = TextAlign.Center,
+                        fontSize = 18.sp
                     )
                 }
-
-                QrCode(
-                    src = link.link,
-                    width = 300,
-                    height = 300,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(top = 4.dp)
-                )
-                Text(
-                    text = link.text,
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.Center)
-                        .padding(top = 10.dp),
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp
-                )
             }
         }
     }

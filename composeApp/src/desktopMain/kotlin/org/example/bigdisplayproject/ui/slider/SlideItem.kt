@@ -64,10 +64,9 @@ import java.util.Locale
 fun SlideItem(
     slideData: SlideData,
     onLeftButtonClick: () -> Unit,
-    showLeftArrow: Boolean,
-    showRightArrow: Boolean,
     onRightButtonClick: () -> Unit,
-    onNewsLinkClick: (Long) -> Unit
+    onNewsLinkClick: (Long) -> Unit,
+    onScheduleLinkClick: () -> Unit
 ) {
     val leftInteractionSource = remember { MutableInteractionSource() }
     val rightInteractionSource = remember { MutableInteractionSource() }
@@ -143,34 +142,32 @@ fun SlideItem(
                 .fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (showLeftArrow) {
-                Box(
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(start = (40).pxToDp())
+                    .clickable(
+                        interactionSource = leftInteractionSource,
+                        indication = null
+                    ) {
+                        onLeftButtonClick()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "",
+                    tint = LightWhite,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(start = (40).pxToDp())
-                        .clickable(
-                            interactionSource = leftInteractionSource,
-                            indication = null
-                        ) {
-                            onLeftButtonClick()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = "",
-                        tint = LightWhite,
-                        modifier = Modifier
-                            .size((100).pxToDp())
-                            .hoverable(leftInteractionSource)
-                            .graphicsLayer {
-                                scaleY = leftScale
-                                scaleX = leftScale
-                                transformOrigin = TransformOrigin(0.5f, 0.5f)
-                                clip = true
-                            }
-                    )
-                }
+                        .size((100).pxToDp())
+                        .hoverable(leftInteractionSource)
+                        .graphicsLayer {
+                            scaleY = leftScale
+                            scaleX = leftScale
+                            transformOrigin = TransformOrigin(0.5f, 0.5f)
+                            clip = true
+                        }
+                )
             }
             Column(
                 modifier = Modifier
@@ -252,37 +249,35 @@ fun SlideItem(
                         .align(textAlignment)
                 )
 
-                LinksBlock(slideData, onNewsLinkClick)
+                LinksBlock(slideData, onNewsLinkClick, onScheduleLinkClick)
 
             }
-            if (showRightArrow) {
-                Box(
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(end = (40).pxToDp())
+                    .clickable(
+                        interactionSource = rightInteractionSource,
+                        indication = null
+                    ) {
+                        onRightButtonClick()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "",
+                    tint = LightWhite,
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(end = (40).pxToDp())
-                        .clickable(
-                            interactionSource = rightInteractionSource,
-                            indication = null
-                        ) {
-                            onRightButtonClick()
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                        contentDescription = "",
-                        tint = LightWhite,
-                        modifier = Modifier
-                            .size((100).pxToDp())
-                            .hoverable(rightInteractionSource)
-                            .graphicsLayer {
-                                scaleY = rightScale
-                                scaleX = rightScale
-                                transformOrigin = TransformOrigin(0.5f, 0.5f)
-                                clip = true
-                            }
-                    )
-                }
+                        .size((100).pxToDp())
+                        .hoverable(rightInteractionSource)
+                        .graphicsLayer {
+                            scaleY = rightScale
+                            scaleX = rightScale
+                            transformOrigin = TransformOrigin(0.5f, 0.5f)
+                            clip = true
+                        }
+                )
             }
         }
     }

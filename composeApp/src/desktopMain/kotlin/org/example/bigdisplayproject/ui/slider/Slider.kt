@@ -41,6 +41,7 @@ import org.example.bigdisplayproject.ui.theme.LightWhite
 fun Slider(
     onMenuButtonClick: () -> Unit,
     onNewsLinkClick: (Long) -> Unit,
+    onScheduleLinkClick: () -> Unit,
     state: SliderStore.State
 ) {
     Scaffold(
@@ -103,7 +104,8 @@ fun Slider(
                     val slides = state.slidesData.importantSlide + state.slidesData.defaultSlide
                     SlidesScreen(
                         slides = slides,
-                        onNewsLinkClick = onNewsLinkClick
+                        onNewsLinkClick = onNewsLinkClick,
+                        onScheduleLinkClick = onScheduleLinkClick
                     )
                 }
                 else -> {}

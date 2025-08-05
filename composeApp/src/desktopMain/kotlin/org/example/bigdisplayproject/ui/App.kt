@@ -109,6 +109,9 @@ fun App() {
                             //navController.navigate(Route.NewsList)
                             newsStore.accept(NewsStore.Intent.GetNewsById(id))
                             navController.navigate(Route.NewsDetail(id))
+                        },
+                        onScheduleLinkClick = {
+                            navController.navigate(Route.Schedule)
                         }
                     )
                 }
