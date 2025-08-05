@@ -99,13 +99,16 @@ fun App() {
                         navController = navController
                     )
                 }
-                composable<Route.Slider>(
-                    // todo: animations
-                ) {
+                composable<Route.Slider> {
                     Slider(
                         state = sliderState,
                         onMenuButtonClick = {
                             navController.navigate(Route.Menu)
+                        },
+                        onNewsLinkClick = { id ->
+                            //navController.navigate(Route.NewsList)
+                            newsStore.accept(NewsStore.Intent.GetNewsById(id))
+                            navController.navigate(Route.NewsDetail(id))
                         }
                     )
                 }

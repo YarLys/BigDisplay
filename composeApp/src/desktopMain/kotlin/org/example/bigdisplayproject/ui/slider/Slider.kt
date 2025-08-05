@@ -40,6 +40,7 @@ import org.example.bigdisplayproject.ui.theme.LightWhite
 @Composable
 fun Slider(
     onMenuButtonClick: () -> Unit,
+    onNewsLinkClick: (Long) -> Unit,
     state: SliderStore.State
 ) {
     Scaffold(
@@ -102,9 +103,7 @@ fun Slider(
                     val slides = state.slidesData.importantSlide + state.slidesData.defaultSlide
                     SlidesScreen(
                         slides = slides,
-                        onLinkClick = { link ->
-
-                        }
+                        onNewsLinkClick = onNewsLinkClick
                     )
                 }
                 else -> {}

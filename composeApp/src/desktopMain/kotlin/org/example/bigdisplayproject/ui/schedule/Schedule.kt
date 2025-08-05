@@ -114,7 +114,7 @@ fun Schedule(
                         .padding(
                             top = (122).pxToDp(),
                             start = (187).pxToDp(),
-                            bottom = (236).pxToDp()
+                            bottom = (227).pxToDp()
                         )
                 ) {
                     Column(
@@ -204,7 +204,10 @@ fun Schedule(
                 ) {
                     when {
                         state.isLoading -> CircularProgressIndicator()
-                        state.error != null -> Text("Ошибка: ${state.error}", color = LightWhite, fontSize = 40.sp)
+                        state.error != null -> {
+                            if (state.error == "WRONG_NAME") Text("Неверное название группы", color = LightWhite, fontSize = 40.sp)
+                            else Text("Ошибка: ${state.error}", color = LightWhite, fontSize = 40.sp)
+                        }
                         state.scheduleData != null && state.calendarData == null -> {   // получили ответ от Api по названию группы
                             getCalendarData(state.scheduleData.iCalLink)
                         }
@@ -407,11 +410,11 @@ fun GradientButton(
             disabledContentColor = Color.Transparent,
         ),
         contentPadding = PaddingValues(0.dp),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(25.dp),
         elevation = null,
         border = null,
         modifier = modifier
-            .size((110).pxToDp())
+            .size((115).pxToDp())
             .clickable(
                 interactionSource = interactionSource,
                 indication = null
@@ -427,12 +430,12 @@ fun GradientButton(
                             LinearGradientButton2
                         )
                     ),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(25.dp)
                 )
                 .border(
-                    shape = RoundedCornerShape(20.dp),
+                    shape = RoundedCornerShape(25.dp),
                     width = 1.dp,
-                    color = Color.White.copy(alpha = 0.05f)
+                    color = Color.White.copy(alpha = 0.07f)
                 )
                 .padding(8.dp),
             contentAlignment = Alignment.Center

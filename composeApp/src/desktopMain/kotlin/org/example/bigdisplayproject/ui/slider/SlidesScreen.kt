@@ -13,7 +13,7 @@ import org.example.bigdisplayproject.data.remote.dto.slider.SlideLink
 @Composable
 fun SlidesScreen(
     slides: List<SlideData>,
-    onLinkClick: (SlideLink) -> Unit
+    onNewsLinkClick: (Long) -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { slides.size })
     val coroutineScope = rememberCoroutineScope()
@@ -37,7 +37,7 @@ fun SlidesScreen(
                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
             },
-            onLinkClick = onLinkClick
+            onNewsLinkClick = onNewsLinkClick
         )
     }
 }

@@ -18,6 +18,6 @@ data class SlideData(
     val links: List<SlideLink>,
     val attachments: SlideAttachment,
     val sides: SlideSides,
-    val keyValue: List<String>?, // TODO: в идеале узнать, что тут может храниться. Пока что приходят ответы с пустым списком.
+    val keyValue: List<SlideKeyValue>?,
     val indexSlide: Long
 )
