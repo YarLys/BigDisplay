@@ -14,6 +14,7 @@ interface ScheduleStore : Store<ScheduleStore.Intent, ScheduleStore.State, Nothi
         data class DownloadCalendar(val url: String): Intent
         data class ParseCalendar(val calendarData: String): Intent
         data class GetEvents(val events: List<CalendarEvent>, val date: LocalDate): Intent
+        object ClearEvents: Intent
     }
 
     // Сообщения от executor к reducer
@@ -24,6 +25,7 @@ interface ScheduleStore : Store<ScheduleStore.Intent, ScheduleStore.State, Nothi
         data class CalendarLoaded(val calendarData: String): Message
         data class CalendarParsed(val events: List<CalendarEvent>): Message
         data class EventsFiltered(val filteredEvents: List<CalendarEvent>): Message
+        object EventsCleaned: Message
     }
 
     // Состояние

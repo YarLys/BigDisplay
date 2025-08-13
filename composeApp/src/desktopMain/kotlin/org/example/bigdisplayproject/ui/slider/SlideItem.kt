@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -246,7 +247,9 @@ fun SlideItem(
                     fontSize = 24.sp,
                     color = Color.White,
                     modifier = Modifier
-                        .align(textAlignment)
+                        .align(textAlignment),
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 6
                 )
 
                 LinksBlock(slideData, onNewsLinkClick, onScheduleLinkClick)

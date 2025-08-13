@@ -8,9 +8,9 @@ data class SlideAttachment(
     val time: String? = "",
     val album: String?,  // TODO: Я предположил, что album, audio, documentation типа String. В идеале узнать точно
     val audio: String?,
-    val links: List<SlideLink>?,
+    val links: Long?,
     val video: SlideVideo?,
     val images: List<SlideImage>?,
     val location: String?,
-    val documentation: String?
+    val documentation: Long?
 )

@@ -20,8 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
@@ -58,6 +63,7 @@ import org.example.bigdisplayproject.ui.theme.White2
 import org.example.bigdisplayproject.ui.util.QrCode
 import org.example.bigdisplayproject.ui.util.pxToDp
 import java.util.Locale
+import kotlin.math.max
 
 @Composable
 fun LinksBlock(
@@ -73,10 +79,10 @@ fun LinksBlock(
         showQrDialog = true
     }
 
-    // Отображение QR-кода
+    // Обработка нажатий на различные ссылки
     if (showQrDialog && selectedLink != null) {
         if (!slideData.keyValue.isNullOrEmpty()) {
-            if (slideData.keyValue[0].key == "id") {
+            if (slideData.keyValue[0].title == "id_news") {
                 // TODO: Проверить переход на экран новостей и выбор новости с этим id
                 onNewsLinkClick(slideData.keyValue[0].value)
             }
@@ -92,28 +98,36 @@ fun LinksBlock(
         }
     }
 
-    if (slideData.links.size > 1) {
+    // Если слайд про новость вики, то нужно вручную "добавить" ссылку на эту новость, чтобы сработала логика ниже
+    val links = slideData.links.toMutableList()
+    if (!slideData.keyValue.isNullOrEmpty()) {
+        if (slideData.keyValue[0].title == "id_news") {
+            links += SlideLink(link = "", text = "Подробнее")
+        }
+    }
+
+    if (links.size > 1) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 175.dp)
+                .heightIn(max = 275.dp)
         ) {
             LazyHorizontalStaggeredGrid(
                 rows = StaggeredGridCells.Adaptive(minSize = (50).pxToDp()),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .padding(top = 50.dp),
                 verticalArrangement = Arrangement.spacedBy((25).pxToDp()),
                 horizontalItemSpacing = (25).pxToDp()
             ) {
-                items(slideData.links) { link ->
+                items(links) { link ->
                     LinkButton(link, onLinkClick)
                 }
             }
         }
     }
-    else if (slideData.links.size == 1) {
-        val link = slideData.links[0]
+    else if (links.size == 1) {
+        val link = links[0]
         val linksAlignment = when (slideData.sides.sideLinks) {
             "left" -> Alignment.TopStart
             "right" -> Alignment.TopEnd
@@ -134,7 +148,7 @@ fun LinksBlock(
 }
 
 @Composable
-fun LinkButton(link: SlideLink, onLinkClick: (SlideLink) -> Unit) {
+fun LinkButton(link: SlideLink, onLinkClick: (SlideLink) -> Unit, modifier: Modifier = Modifier) {
     Button(
         onClick = {
             onLinkClick(link)
@@ -145,14 +159,16 @@ fun LinkButton(link: SlideLink, onLinkClick: (SlideLink) -> Unit) {
             disabledContentColor = White2,
             disabledContainerColor = White2
         ),
-        modifier = Modifier
+        modifier = modifier
             .height((50).pxToDp())
     ) {
         Text(
             text = link.text.uppercase(Locale.getDefault()),
             fontSize = 16.sp,
             color = Color.Black,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
+            textAlign = TextAlign.Center
         )
     }
 }

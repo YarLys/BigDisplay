@@ -106,7 +106,6 @@ fun App() {
                             navController.navigate(Route.Menu)
                         },
                         onNewsLinkClick = { id ->
-                            //navController.navigate(Route.NewsList)
                             newsStore.accept(NewsStore.Intent.GetNewsById(id))
                             navController.navigate(Route.NewsDetail(id))
                         },
@@ -118,7 +117,10 @@ fun App() {
                 composable<Route.Schedule> {
                     Schedule(
                         state = scheduleState,
-                        onBackButtonClick = { navController.navigateUp() },
+                        onBackButtonClick = {
+                            navController.navigateUp()
+                            scheduleStore.accept(ScheduleStore.Intent.ClearEvents)
+                        },
                         getSchedule = { name ->
                             scheduleStore.accept(ScheduleStore.Intent.GetSchedule(name))
                         },
@@ -134,37 +136,28 @@ fun App() {
                     )
                 }
                 composable<Route.NewsList> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        when {
-                            newsState.isLoading -> CircularProgressIndicator()
-                            newsState.error != null -> Text("Ошибка: ${newsState.error}")
-                            else -> {
-                                NewsList(
-                                    newsList = newsState.news,
-                                    listState = listState,
-                                    onItemClick = { id ->
-                                        newsStore.accept(NewsStore.Intent.GetNewsById(id))  // предзагружаем данные
-                                        navController.navigate(Route.NewsDetail(id)) {
-                                            popUpTo(Route.NewsList) {
-                                                saveState = true
-                                            }
-                                            restoreState = true
-                                        }
-                                    },
-                                    onButtonClick = {
-                                        navController.navigateUp()
-                                    },
-                                    /*isRefreshing = false,
-                                    onRefresh = {
-                                        store.accept(NewsStore.Intent.Refresh)
-                                    },*/
-                                )
+                    NewsList(
+                        state = newsState,
+                        listState = listState,
+                        onItemClick = { id ->
+                            newsStore.accept(NewsStore.Intent.GetNewsById(id))  // предзагружаем данные
+                            navController.navigate(Route.NewsDetail(id)) {
+                                popUpTo(Route.NewsList) {
+                                    saveState = true
+                                }
+                                restoreState = true
                             }
-                        }
-                    }
+                        },
+                        onButtonClick = {
+                            navController.navigateUp()
+                            // TODO: Не понимаю, почему не работает. Нужно, чтобы при следующем заходе новости отображались сначала
+                            newsStore.accept(NewsStore.Intent.UpdateScrollPosition(0))
+                        },
+                        /*isRefreshing = false,
+                        onRefresh = {
+                            store.accept(NewsStore.Intent.Refresh)
+                        },*/
+                    )
                 }
                 dialog<Route.NewsDetail>(
                     dialogProperties = DialogProperties(

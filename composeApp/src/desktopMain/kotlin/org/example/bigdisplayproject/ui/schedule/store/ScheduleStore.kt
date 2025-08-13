@@ -35,6 +35,7 @@ internal class ScheduleStoreFactory(
                 is ScheduleStore.Intent.DownloadCalendar -> downloadCalendar(intent.url)
                 is ScheduleStore.Intent.ParseCalendar -> parseCalendar(intent.calendarData)
                 is ScheduleStore.Intent.GetEvents -> filterEvents(intent.events, intent.date)
+                is ScheduleStore.Intent.ClearEvents -> dispatch(ScheduleStore.Message.EventsCleaned)
             }
         }
 
@@ -109,6 +110,14 @@ internal class ScheduleStoreFactory(
                     isLoading = false,
                     filteredEvents = msg.filteredEvents,
                     error = null
+                )
+                is ScheduleStore.Message.EventsCleaned -> copy(
+                    isLoading = false,
+                    error = null,
+                    scheduleData = null,
+                    calendarData = null,
+                    events = null,
+                    filteredEvents = null
                 )
             }
     }

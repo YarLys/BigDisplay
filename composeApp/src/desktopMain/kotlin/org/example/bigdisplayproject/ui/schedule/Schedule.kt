@@ -1,14 +1,21 @@
 package org.example.bigdisplayproject.ui.schedule
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -49,12 +57,21 @@ import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDate
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStore
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
 import org.example.bigdisplayproject.ui.components.BottomPanel
 import org.example.bigdisplayproject.ui.util.pxToDp
@@ -77,7 +94,9 @@ import org.example.bigdisplayproject.ui.theme.GradientColor9
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton1
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton2
+import org.example.bigdisplayproject.ui.util.Scroller
 import java.io.File
+import java.time.DayOfWeek
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -177,10 +196,13 @@ fun Schedule(
                                 when (symbol) {
                                     "<" -> {
                                         if (group.value.isNotEmpty()) {
-                                            if (group.value.last() == '-') group.value = group.value.substring(0, group.value.length-2)
-                                            else group.value = group.value.substring(0, group.value.length-1)
+                                            if (group.value.last() == '-') group.value =
+                                                group.value.substring(0, group.value.length - 2)
+                                            else group.value =
+                                                group.value.substring(0, group.value.length - 1)
                                         }
                                     }
+
                                     else -> {
                                         if (group.value.length < 10) group.value += symbol
                                         if (group.value.length == 4) group.value += '-'
@@ -205,21 +227,26 @@ fun Schedule(
                     when {
                         state.isLoading -> CircularProgressIndicator()
                         state.error != null -> {
-                            if (state.error == "WRONG_NAME") Text("Неверное название группы", color = LightWhite, fontSize = 40.sp)
-                            else Text("Ошибка: ${state.error}", color = LightWhite, fontSize = 40.sp)
+                            if (state.error == "WRONG_NAME") Text(
+                                "Неверное название группы",
+                                color = LightWhite,
+                                fontSize = 40.sp
+                            )
+                            else Text(
+                                "Ошибка: ${state.error}",
+                                color = LightWhite,
+                                fontSize = 40.sp
+                            )
                         }
+
                         state.scheduleData != null && state.calendarData == null -> {   // получили ответ от Api по названию группы
                             getCalendarData(state.scheduleData.iCalLink)
                         }
+
                         state.calendarData != null && state.events == null -> {   // скачали iCal файл с расписанием
                             parseCalendar(state.calendarData)  // Парсим полученные данные о расписании
-
-                            // Затем, здесь можно будет добавить новую ветку в when, которая будет уже отображать lazycolumn
-                            // с событиями из state. Возможно ещё обрабатывать нажатия клавиш внизу, которые будут менять день
-                            // для просмотра расписания, посылать intent в store, чтобы снова вызвать getEvents в store.
-                            // При смене названия, изменится состояние, и пропадет старое расписание. При смене дня будет обновляться список
-                            // events для отображения.
                         }
+
                         state.events != null && state.filteredEvents == null -> {
                             File("DateSchedule.txt").printWriter().use { out ->
                                 for (event in state.events) {
@@ -228,13 +255,23 @@ fun Schedule(
                             }
 
                             // Выбираем события для выбранной даты
-                            //getEvents(state.events, LocalDate(2025, 4, 8))
-
-                            getEvents(state.events, LocalDate(currentDate.year, currentDate.month, currentDate.dayOfMonth))
+                            getEvents(
+                                state.events,
+                                LocalDate(
+                                    currentDate.year,
+                                    currentDate.month,
+                                    currentDate.dayOfMonth
+                                )
+                            )
                         }
+
                         state.filteredEvents != null -> {
                             LazyColumn(
-                                modifier = Modifier.padding(bottom = (269).pxToDp(), end = (80).pxToDp())
+                                modifier = Modifier
+                                    .padding(
+                                        bottom = (269).pxToDp(),
+                                        end = (80).pxToDp()
+                                    )
                             ) {
                                 items(state.filteredEvents) { event ->
                                     ScheduleCard(event)
@@ -243,7 +280,11 @@ fun Schedule(
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = (774).pxToDp(), bottom = (126).pxToDp(), start = (63).pxToDp()),
+                                    .padding(
+                                        top = (774).pxToDp(),
+                                        bottom = (126).pxToDp(),
+                                        start = (63).pxToDp()
+                                    ),
                                 horizontalArrangement = Arrangement.spacedBy((32).pxToDp())
                             ) {
                                 val interactionSource = remember { MutableInteractionSource() }
@@ -302,8 +343,18 @@ fun Schedule(
                                         val date = DateTimeFormatter
                                             .ofPattern("dd.MM.yyyy")
                                             .format(currentDate)
+                                        val dayOfWeek = when (currentDate.dayOfWeek) {
+                                            DayOfWeek.MONDAY -> "/Пн"
+                                            DayOfWeek.TUESDAY -> "/Вт"
+                                            DayOfWeek.WEDNESDAY -> "/Ср"
+                                            DayOfWeek.THURSDAY -> "/Чт"
+                                            DayOfWeek.FRIDAY -> "/Пт"
+                                            DayOfWeek.SATURDAY -> "/Сб"
+                                            DayOfWeek.SUNDAY -> "/Вс"
+                                            else -> ""
+                                        }
                                         Text(
-                                            text = date,
+                                            text = "$date$dayOfWeek",
                                             color = DarkGray,
                                             fontSize = 40.sp
                                         )
@@ -324,7 +375,14 @@ fun Schedule(
                                             currentDate = currentDate.plusDays(1)
 
                                             if (state.events != null)
-                                                getEvents(state.events, LocalDate(currentDate.year, currentDate.month, currentDate.dayOfMonth))
+                                                getEvents(
+                                                    state.events,
+                                                    LocalDate(
+                                                        currentDate.year,
+                                                        currentDate.month,
+                                                        currentDate.dayOfMonth
+                                                    )
+                                                )
                                         },
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -358,11 +416,17 @@ fun Schedule(
                                 }*/
                             }
                         }
+
                         group.value.length == 10 -> {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = (50).pxToDp(), start = (30).pxToDp(), bottom = (22).pxToDp(), end = (50).pxToDp()),
+                                    .padding(
+                                        top = (50).pxToDp(),
+                                        start = (30).pxToDp(),
+                                        bottom = (22).pxToDp(),
+                                        end = (50).pxToDp()
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -372,11 +436,17 @@ fun Schedule(
                                 )
                             }
                         }
+
                         else -> {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(top = (50).pxToDp(), start = (30).pxToDp(), bottom = (22).pxToDp(), end = (50).pxToDp()),
+                                    .padding(
+                                        top = (50).pxToDp(),
+                                        start = (30).pxToDp(),
+                                        bottom = (22).pxToDp(),
+                                        end = (50).pxToDp()
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(

@@ -65,6 +65,7 @@ import org.example.bigdisplayproject.ui.util.QrCode
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
+import org.example.bigdisplayproject.ui.util.Scroller
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -197,75 +198,31 @@ fun NewsDetails(
                                         .align(Alignment.CenterHorizontally)
                                 )
                             }
+                            else {
+                                if (news.text.contains("Ссылка:")) {
+                                    val pattern = "Ссылка: (.+)"
+                                    val match = Regex(pattern).find(news.text)
+                                    if (match != null) {
+                                        val src = match.groupValues[1]
+                                        QrCode(
+                                            src,
+                                            modifier = Modifier.background(LightWhite)
+                                                .align(Alignment.CenterHorizontally)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
 
                     if (isScrollable) {
-                        val scope = rememberCoroutineScope()
-                        val scrollbarWidth = 8.dp
-                        val scrollbarColor = DarkGray.copy(alpha = 0.5f * scrollbarAlpha)
-                        val thumbColor = DarkGray.copy(alpha = scrollbarAlpha)
-
-                        Box(
+                        Scroller(
+                            scrollState = scrollState,
+                            scrollbarAlpha = scrollbarAlpha,
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .width(scrollbarWidth + 4.dp)
                                 .align(Alignment.CenterVertically)
                                 .padding(top = 70.dp)
-                                .pointerInput(Unit) {
-                                    detectDragGestures(
-                                        onDrag = { change, dragAmount ->
-                                            val maxHeight = size.height
-                                            val sensitivity = 2.5f
-                                            val delta = (dragAmount.y * sensitivity * scrollState.maxValue / maxHeight)
-                                            val newOffset = (scrollState.value + delta)
-                                                .coerceIn(0f, scrollState.maxValue.toFloat())
-                                            scope.launch {
-                                                scrollState.scrollTo(newOffset.toInt())
-                                            }
-                                        }
-                                    )
-                                }
-                                .pointerInput(Unit) {
-                                    detectTapGestures { offset ->
-                                        val maxHeight = size.height
-                                        val newValue = (offset.y / maxHeight) * scrollState.maxValue
-                                        scope.launch {
-                                            scrollState.scrollTo(newValue.toInt())
-                                        }
-                                    }
-                                }
-                        ) {
-                            Canvas(
-                                modifier = Modifier.fillMaxSize()
-                            ) {
-                                val scrollbarHeight = size.height
-                                val scrollbarTop = 0f
-
-                                drawRoundRect(
-                                    color = scrollbarColor,
-                                    topLeft = Offset(size.width - scrollbarWidth.toPx(), scrollbarTop),
-                                    size = Size(scrollbarWidth.toPx(), scrollbarHeight),
-                                    cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
-                                )
-
-                                val visibleHeight = scrollbarHeight
-                                val contentHeight = scrollState.maxValue + visibleHeight
-                                val thumbHeight = (visibleHeight * (visibleHeight / contentHeight))
-                                    .coerceAtLeast(32.dp.toPx())
-                                    .coerceAtMost(visibleHeight)
-
-                                val thumbOffset = (scrollState.value * (visibleHeight / contentHeight))
-                                    .coerceAtMost(visibleHeight - thumbHeight)
-
-                                drawRoundRect(
-                                    color = thumbColor,
-                                    topLeft = Offset(size.width - scrollbarWidth.toPx(), thumbOffset),
-                                    size = Size(scrollbarWidth.toPx(), thumbHeight),
-                                    cornerRadius = CornerRadius(scrollbarWidth.toPx() / 2)
-                                )
-                            }
-                        }
+                        )
                     }
                 }
 

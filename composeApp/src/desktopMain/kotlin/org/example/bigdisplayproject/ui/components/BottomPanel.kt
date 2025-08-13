@@ -33,8 +33,12 @@ import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
 import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo
 import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo_svg
 import bigdisplayproject.composeapp.generated.resources.separator
+import kotlinx.datetime.LocalDate
+import org.example.bigdisplayproject.domain.usecases.schedule.getWeekNumber
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.Date
 
 @Composable
@@ -44,13 +48,13 @@ fun BottomPanel(
     icon: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft
 ) {
     val currentTime = remember { mutableStateOf(getCurrentTime()) }
-    val currentLabel = remember { mutableStateOf(getLabelText(currentTime.value)) }
+    val currentLabel = remember { mutableStateOf(getLabelText()) }
     val currentWeek = remember { mutableStateOf(getCurrentWeek(currentTime.value)) }
     LaunchedEffect(Unit) {
         while (true) {
             delay(1000)
             currentTime.value = getCurrentTime()
-            currentLabel.value = getLabelText(currentTime.value)
+            currentLabel.value = getLabelText()
             currentWeek.value = getCurrentWeek(currentTime.value)
         }
     }
@@ -122,39 +126,44 @@ private fun getCurrentTime(): String {
     return sdf.format(Date())
 }
 
-private fun getLabelText(time: String): String {  // мб можно улучшить, пока что пофиг
-    val hh = time.substring(0, 2).toInt()
-    val mm = time.substring(3, 5).toInt()
+private fun getLabelText(): String {
+    val currentDate = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
+    val localDate = LocalDate(
+        currentDate.year,
+        currentDate.month,
+        currentDate.dayOfMonth
+    )
+    val weekNum = getWeekNumber(localDate)
 
-    if (hh == 9 || (hh == 10 && mm <= 29)) return "Идёт 1-ая пара"
-    else if (hh == 10 && mm in 30..39) return "Перерыв перед 2-ой парой"
-    else if (hh == 11 || (hh == 10 && mm in 40..60) || (hh == 12 && mm <= 9)) return "Идёт 2-ая пара"
-    else if (hh == 12 && mm in 10..39) return "Большой перерыв перед 3-ей парой"
-    else if (hh == 13 || (hh == 12 && mm in 40..60) || (hh == 14 && mm <= 9)) return "Идёт 3-ья пара"
-    else if (hh == 14 && mm in 10..19) return "Перерыв перед 4-ой парой"
-    else if ((hh == 14 && mm in 20..60) || (hh == 15 && mm <= 49)) return "Идёт 4-ая пара"
-    else if ((hh == 15 && mm in 50..60) || (hh == 16 && mm <= 19)) return "Большой перерыв перед 5-ой парой"
-    else if ((hh == 16 && mm in 20..60) || (hh == 17 && mm <= 49)) return "Идёт 5-ая пара"
-    else if (hh == 17 && mm in 50..59) return "Перерыв перед 6-ой парой"
-    else if (hh == 18 || (hh == 19 && mm <= 29)) return "Идёт 6-ая пара"
-    else if (hh == 19 && mm in 30..39) return "Перерыв перед 7-ой парой"
-    else if ((hh == 19 && mm in 40..60) || hh == 20 || (hh == 21 && mm <= 9)) return "Идёт 7-ая пара"
-    else return ""
+    if (weekNum < 18) {
+        val hh = currentDate.hour
+        val mm = currentDate.minute
+        if (hh == 9 || (hh == 10 && mm <= 29)) return "Идёт 1-ая пара"
+        else if (hh == 10 && mm in 30..39) return "Перерыв перед 2-ой парой"
+        else if (hh == 11 || (hh == 10 && mm in 40..60) || (hh == 12 && mm <= 9)) return "Идёт 2-ая пара"
+        else if (hh == 12 && mm in 10..39) return "Большой перерыв перед 3-ей парой"
+        else if (hh == 13 || (hh == 12 && mm in 40..60) || (hh == 14 && mm <= 9)) return "Идёт 3-ья пара"
+        else if (hh == 14 && mm in 10..19) return "Перерыв перед 4-ой парой"
+        else if ((hh == 14 && mm in 20..60) || (hh == 15 && mm <= 49)) return "Идёт 4-ая пара"
+        else if ((hh == 15 && mm in 50..60) || (hh == 16 && mm <= 19)) return "Большой перерыв перед 5-ой парой"
+        else if ((hh == 16 && mm in 20..60) || (hh == 17 && mm <= 49)) return "Идёт 5-ая пара"
+        else if (hh == 17 && mm in 50..59) return "Перерыв перед 6-ой парой"
+        else if (hh == 18 || (hh == 19 && mm <= 29)) return "Идёт 6-ая пара"
+        else if (hh == 19 && mm in 30..39) return "Перерыв перед 7-ой парой"
+        else if ((hh == 19 && mm in 40..60) || hh == 20 || (hh == 21 && mm <= 9)) return "Идёт 7-ая пара"
+    }
+    return ""
 }
 
-private fun getCurrentWeek(time: String): String {   // TODO надо переделывать, временное решение
-    val dd = time.substring(9, 11).toInt()
-    val MM = time.substring(12, 14).toInt()
+private fun getCurrentWeek(time: String): String {
+    val currentDate = ZonedDateTime.now(ZoneId.of("Europe/Moscow"))
+    val localDate = LocalDate(
+        currentDate.year,
+        currentDate.month,
+        currentDate.dayOfMonth
+    )
+    val weekNum = getWeekNumber(localDate)
 
-    var week = 0
-    var dd_now = 5
-    if (MM == 5) {
-        dd_now = 5
-        week = 13 + (dd - dd_now) / 7
-    }
-    else {
-        dd_now = 2
-        week = 17 + (dd - dd_now) / 7
-    }
-    return "$week-я неделя ${time.substring(9)}"
+    return if (weekNum < 18) "$weekNum-я неделя ${time.substring(9)}"
+    else time.substring(9)
 }

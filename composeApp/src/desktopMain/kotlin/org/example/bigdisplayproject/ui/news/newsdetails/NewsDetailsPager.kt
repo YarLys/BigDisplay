@@ -43,6 +43,7 @@ import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
+import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_WIDTH
 import org.example.bigdisplayproject.ui.util.dpToPx
@@ -70,15 +71,22 @@ fun newsDetailsPager(
                     imageHeight = attachment.image.height.toInt()
                     imageWidth = attachment.image.width.toInt()
                 }
+
                 is Link -> {
                     src = attachment.image.src
                     imageHeight = attachment.image.height.toInt()
                     imageWidth = attachment.image.width.toInt()
                 }
+
                 else -> {}
             }
-            if (shouldApplyBlur(IntSize(width = imageWidth, height = imageHeight),
-                    IntSize(width = CARD_DETAIL_WIDTH / 2, height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()))
+            if (shouldApplyBlur(
+                    IntSize(width = imageWidth, height = imageHeight),
+                    IntSize(
+                        width = CARD_DETAIL_WIDTH / 2,
+                        height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()
+                    )
+                )
             ) { // небольшой нюанс
                 AsyncImage(
                     model = ImageRequest.Builder(LocalPlatformContext.current)
@@ -136,7 +144,7 @@ fun newsDetailsPager(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(4.dp)
-                            .size(64.dp)
+                            .size(74.dp)
                             .hoverable(leftInteractionSource),
                         interactionSource = leftInteractionSource
                     ) {
@@ -144,7 +152,7 @@ fun newsDetailsPager(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                             contentDescription = "Previous",
                             tint = Color.White,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(42.dp)
                         )
                     }
                 }
@@ -162,7 +170,7 @@ fun newsDetailsPager(
                         modifier = Modifier
                             .align(Alignment.CenterEnd)
                             .padding(4.dp)
-                            .size(64.dp)
+                            .size(74.dp)
                             .hoverable(rightInteractionSource),
                         interactionSource = rightInteractionSource
                     ) {
@@ -170,7 +178,7 @@ fun newsDetailsPager(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                             contentDescription = "Next",
                             tint = Color.White,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(42.dp)
                         )
                     }
                 }
@@ -180,7 +188,7 @@ fun newsDetailsPager(
                         .align(Alignment.BottomCenter)
                         .padding(bottom = 16.dp)
                         .height(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     repeat(attachments.size) { i ->
                         Box(
