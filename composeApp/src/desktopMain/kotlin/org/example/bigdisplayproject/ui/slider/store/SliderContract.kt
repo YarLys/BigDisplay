@@ -8,12 +8,13 @@ import org.example.bigdisplayproject.data.remote.dto.slider.GroupSlidesData
 interface SliderStore : Store<SliderStore.Intent, SliderStore.State, Nothing> {
 
     sealed interface Action {
-        class LoadSlides(): Action
+        object LoadSlides: Action
     }
 
     // Интенты
     sealed interface Intent : JvmSerializable {
         object GetSlides: Intent
+        data class DownloadFile(val url: String, val outputPath: String): Intent
     }
 
     // Сообщения от executor к reducer
@@ -21,6 +22,7 @@ interface SliderStore : Store<SliderStore.Intent, SliderStore.State, Nothing> {
         data class Error(val message: String): Message
         object Loading: Message
         data class SlidesLoaded(val slidesData: GroupSlidesData): Message
+        object FileDownloaded: Message
     }
 
     // Состояние
@@ -28,6 +30,7 @@ interface SliderStore : Store<SliderStore.Intent, SliderStore.State, Nothing> {
         val isLoading: Boolean = false,
         val slidesData: GroupSlidesData? = null,
         val error: String? = null,
+        val fileNum: Int = 0
     ) : JvmSerializable
 
 }

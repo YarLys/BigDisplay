@@ -7,9 +7,11 @@ import org.example.bigdisplayproject.data.remote.SliderClient
 import org.example.bigdisplayproject.data.remote.api.NewsApi
 import org.example.bigdisplayproject.data.remote.api.ScheduleApi
 import org.example.bigdisplayproject.data.remote.api.SliderApi
+import org.example.bigdisplayproject.data.repository.FileDownloaderRepository
 import org.example.bigdisplayproject.data.repository.NewsRepository
 import org.example.bigdisplayproject.data.repository.ScheduleRepository
 import org.example.bigdisplayproject.data.repository.SliderRepository
+import org.example.bigdisplayproject.domain.usecases.common.DownloadFileUseCase
 import org.example.bigdisplayproject.domain.usecases.news.GetNewsByIdUseCase
 import org.example.bigdisplayproject.domain.usecases.news.GetNewsUseCase
 import org.example.bigdisplayproject.domain.usecases.news.NewsUseCases
@@ -20,6 +22,7 @@ import org.example.bigdisplayproject.domain.usecases.slider.GetSlidesUseCase
 import org.example.bigdisplayproject.ui.news.store.NewsStoreFactory
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStoreFactory
 import org.example.bigdisplayproject.ui.slider.store.SliderStoreFactory
+import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
@@ -36,11 +39,17 @@ val koinModule = module {
     singleOf(::NewsRepository)
     singleOf(::ScheduleRepository)
     singleOf(::SliderRepository)
+    singleOf(::FileDownloaderRepository) {
+        onClose {
+            it?.close()
+        }
+    }
 
     singleOf(::GetNewsUseCase)
     singleOf(::GetNewsByIdUseCase)
     singleOf(::NewsUseCases)
     singleOf(::GetSlidesUseCase)
+    singleOf(::DownloadFileUseCase)
 
     singleOf(::GetScheduleUseCase)
     singleOf(::DownloadCalendarUseCase)
@@ -63,7 +72,8 @@ val koinModule = module {
     single {
         SliderStoreFactory(
             storeFactory = DefaultStoreFactory(),
-            getSlidesUseCase = get()
+            getSlidesUseCase = get(),
+            downloadFileUseCase = get()
         ).create()
     }
 

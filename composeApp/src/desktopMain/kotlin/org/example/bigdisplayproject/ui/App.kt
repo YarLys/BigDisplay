@@ -1,23 +1,10 @@
 package org.example.bigdisplayproject.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,9 +33,12 @@ import org.koin.core.context.startKoin
 @Composable
 @Preview
 fun App() {
-    startKoin {
+    val koinApp = startKoin {
         modules(koinModule)
-    }
+    }.koin
+    Runtime.getRuntime().addShutdownHook(Thread {
+        koinApp.close() // Это вызовет onClose для всех зарегистрированных компонентов
+    })
 
     MaterialTheme {
         val newsStore: NewsStore = getKoin().get()
@@ -77,7 +67,6 @@ fun App() {
             navController = navController,
             startDestination = Route.NewsGraph
         ) {
-            // TODO: Переписать, чтобы было как в ветке Schedule
             navigation<Route.NewsGraph>(
                 startDestination = Route.Slider
             ) {
@@ -111,6 +100,10 @@ fun App() {
                         },
                         onScheduleLinkClick = {
                             navController.navigate(Route.Schedule)
+                        },
+                        onDownloadVideo = { url ->
+                            val outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\video1.mp4"
+                            sliderStore.accept(SliderStore.Intent.DownloadFile(url, outputPath))
                         }
                     )
                 }
@@ -167,52 +160,16 @@ fun App() {
                     )
                 ) { entry ->
                     val args = entry.toRoute<Route.NewsDetail>()
-
-                    var isDialogVisible by remember { mutableStateOf(false) }
-
                     LaunchedEffect(Unit) {
-                        isDialogVisible = true
-                    }
+                        println("SELECTED NEWS_ID: ${args.id}")
+                    }   // debug
 
-                    DisposableEffect(Unit) {
-                        onDispose { isDialogVisible = false }
-                    }
-
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        AnimatedVisibility(
-                            visible = isDialogVisible,
-                            enter = fadeIn(animationSpec = tween(700)) +
-                                    scaleIn(initialScale = 0.9f, animationSpec = tween(500)),
-                            exit = fadeOut(animationSpec = tween(700)) +
-                                    scaleOut(targetScale = 0.9f, animationSpec = tween(500)),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-
-                            LaunchedEffect(Unit) {
-                                println("SELECTED NEWS_ID: ${args.id}")
-                            }   // debug
-                            /*LaunchedEffect(args.id) {
-                                store.accept(NewsStore.Intent.GetNewsById(args.id))
-                            }*/
-
-                            if (newsState.error != null) {
-                                Text("Ошибка: ${newsState.error}")
-                            } else if (newsState.isLoading) {
-                                CircularProgressIndicator()
-                            } else newsState.selectedNews?.let { news ->
-                                NewsDetails(
-                                    news = news,
-                                    onBackButtonClick = {
-                                        navController.navigateUp()
-                                    }
-                                )
-                            } ?: Text("Новость не найдена")
-
+                    NewsDetails(
+                        state = newsState,
+                        onBackButtonClick = {
+                            navController.navigateUp()
                         }
-                    }
+                    )
                 }
             }
         }

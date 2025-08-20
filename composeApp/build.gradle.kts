@@ -60,6 +60,8 @@ kotlin {
             implementation("io.ktor:ktor-client-cio:2.3.7")
             implementation("io.ktor:ktor-client-content-negotiation:2.3.7")
             implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.7")
+            implementation("io.ktor:ktor-client-logging:2.3.7")
+            implementation("io.ktor:ktor-client-okhttp:2.3.7")
             // Koin (DI)
             implementation("io.insert-koin:koin-core:3.5.6")
             implementation("io.insert-koin:koin-compose:1.1.0")
