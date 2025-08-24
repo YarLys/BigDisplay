@@ -41,7 +41,7 @@ kotlin {
             implementation("com.google.zxing:core:3.5.1")
             implementation("com.google.zxing:javase:3.5.1")
             // Video player
-
+            implementation("uk.co.caprica:vlcj:4.7.0")
             // Navigation
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
             // Coil

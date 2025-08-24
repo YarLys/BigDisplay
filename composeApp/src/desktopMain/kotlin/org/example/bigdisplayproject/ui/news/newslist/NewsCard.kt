@@ -1,5 +1,6 @@
 package org.example.bigdisplayproject.ui.news.newslist
 
+import VideoPlayerImpl
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +44,7 @@ import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.News
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Video
 import org.example.bigdisplayproject.ui.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite
@@ -99,7 +102,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 val attachment = checkAttachments(news)
-                if (news.image != null || attachment != null) {
+                if (news.image != null || (attachment != null && attachment !is Video)) {
                     var src = ""
                     var imageWidth = 0
                     if (attachment != null) {
@@ -186,8 +189,3 @@ fun checkAttachments(news: News): Attachment? {
     }
     return null
 }
-
-
-/*if (news.id == (1710).toLong() && attachment is Video) {
-VideoPlayer1("https://vk.com/video${attachment.ownedId}_${attachment.objectId}")
-}*/

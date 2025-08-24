@@ -5,13 +5,17 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.api.NewsApi
+import org.example.bigdisplayproject.data.remote.dto.news.News
+import org.example.bigdisplayproject.data.remote.dto.news.Video
+import org.example.bigdisplayproject.domain.usecases.common.DownloadFileUseCase
 import org.example.bigdisplayproject.domain.usecases.news.NewsUseCases
 import org.example.bigdisplayproject.domain.util.onError
 import org.example.bigdisplayproject.domain.util.onSuccess
 
 internal class NewsStoreFactory(
     private val storeFactory: StoreFactory,
-    private val newsUseCases: NewsUseCases
+    private val newsUseCases: NewsUseCases,
+    private val downloadFileUseCase: DownloadFileUseCase
 ) {   // когда-нибудь потом вынести storeFactory в DI
 
     fun create(): NewsStore =
@@ -19,7 +23,7 @@ internal class NewsStoreFactory(
             name = "CounterStore",
             initialState = NewsStore.State(),
             bootstrapper = BootstrapperImpl(),
-            executorFactory = { ExecutorImpl(newsUseCases) },
+            executorFactory = { ExecutorImpl(newsUseCases, downloadFileUseCase) },
             reducer = ReducerImpl
         ) {}
 
@@ -30,7 +34,8 @@ internal class NewsStoreFactory(
     }
 
     private class ExecutorImpl(
-        private val newsUseCases: NewsUseCases
+        private val newsUseCases: NewsUseCases,
+        private val downloadFileUseCase: DownloadFileUseCase
     ) : CoroutineExecutor<NewsStore.Intent, NewsStore.Action, NewsStore.State, NewsStore.Message, Nothing>() {
         override fun executeAction(action: NewsStore.Action) {    // process actions from bootstrapper
             when (action) {
@@ -48,6 +53,7 @@ internal class NewsStoreFactory(
                         intent.position
                     )
                 )
+                is NewsStore.Intent.DownloadFile -> downloadFile(intent.url, intent.outputPath)
             }
         }
 
@@ -56,6 +62,7 @@ internal class NewsStoreFactory(
             val news = newsUseCases.getNewsUseCase()
                 .onSuccess {
                     dispatch(NewsStore.Message.NewsLoaded(it))
+                    downloadNewsVideos(it)
                 }
                 .onError {
                     println("ERROR: ${it.toString()}")
@@ -72,6 +79,29 @@ internal class NewsStoreFactory(
                     println("ERROR: ${it.toString()}")
                     dispatch(NewsStore.Message.Error(it.toString()))
                 }
+        }
+
+        private fun downloadNewsVideos(newsList: List<News>) = scope.launch {
+            for (news in newsList) {
+                for (attachment in news.attachments) {
+                    if (attachment is Video) {
+                        downloadFile(
+                            url = "https://vk.com/video${attachment.ownedId}_${attachment.objectId}",
+                            outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\newsVideo\\video${news.id}.mp4"
+                        )
+                    }
+                }
+            }
+        }
+
+        private fun downloadFile(url: String, outputPath: String) = scope.launch {
+            dispatch(NewsStore.Message.Loading)
+            try {
+                downloadFileUseCase(url, outputPath)
+                dispatch(NewsStore.Message.FileDownloaded)
+            } catch (e: Exception) {
+                dispatch(NewsStore.Message.Error(e.message ?: "Unknown error"))
+            }
         }
 
         private fun refresh() {
@@ -100,6 +130,10 @@ internal class NewsStoreFactory(
                 is NewsStore.Message.Error -> copy(isLoading = false, error = msg.message)
                 is NewsStore.Message.Loading -> copy(isLoading = true)
                 is NewsStore.Message.ScrollPositionUpdated -> copy(scrollPosition = msg.position)
+                is NewsStore.Message.FileDownloaded -> copy(
+                    isLoading = false,
+                    error = null
+                )
             }
     }
 }

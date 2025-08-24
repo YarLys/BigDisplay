@@ -58,7 +58,8 @@ val koinModule = module {
     single {
         NewsStoreFactory(
             storeFactory = DefaultStoreFactory(),
-            newsUseCases = get()
+            newsUseCases = get(),
+            downloadFileUseCase = get()
         ).create()
     }
 

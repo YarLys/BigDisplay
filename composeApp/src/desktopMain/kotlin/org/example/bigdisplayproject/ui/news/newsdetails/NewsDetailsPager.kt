@@ -1,5 +1,6 @@
 package org.example.bigdisplayproject.ui.news.newsdetails
 
+import VideoPlayerImpl
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
@@ -43,6 +44,7 @@ import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Video
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_WIDTH
@@ -52,7 +54,8 @@ import kotlin.math.abs
 @Composable
 fun newsDetailsPager(
     pagerState: PagerState,
-    attachments: List<Attachment>
+    attachments: List<Attachment>,
+    newsId: Long
 ) {
     HorizontalPager(
         state = pagerState,
@@ -65,7 +68,8 @@ fun newsDetailsPager(
             var src = ""
             var imageHeight = 0
             var imageWidth = 0
-            when (val attachment = attachments[index]) {
+            val attachment = attachments[index]
+            when (attachment) {
                 is Photo -> {
                     src = attachment.image.src
                     imageHeight = attachment.image.height.toInt()
@@ -78,16 +82,48 @@ fun newsDetailsPager(
                     imageWidth = attachment.image.width.toInt()
                 }
 
+                is Video -> {
+                    src = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\newsVideo\\video${newsId}.mp4"
+                }
+
                 else -> {}
             }
-            if (shouldApplyBlur(
-                    IntSize(width = imageWidth, height = imageHeight),
-                    IntSize(
-                        width = CARD_DETAIL_WIDTH / 2,
-                        height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()
-                    )
+            if (attachment is Video) {
+                VideoPlayerImpl(
+                    url = src,
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(color = Color.Transparent, shape = RoundedCornerShape(16.dp))
+                        .fillMaxSize()
                 )
-            ) { // небольшой нюанс
+            } else {
+                if (shouldApplyBlur(
+                        IntSize(width = imageWidth, height = imageHeight),
+                        IntSize(
+                            width = CARD_DETAIL_WIDTH / 2,
+                            height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()
+                        )
+                    )
+                ) { // небольшой нюанс
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalPlatformContext.current)
+                            .data(src)
+                            .apply {
+                                headers {
+                                    append("User-Agent", "Mozilla/5.0")
+                                    append("Referer", "https://vk.com/")
+                                }
+                            }
+                            .build(),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .blur(3.5.dp)
+                            .alpha(0.9f)
+                    )
+                }
                 AsyncImage(
                     model = ImageRequest.Builder(LocalPlatformContext.current)
                         .data(src)
@@ -99,33 +135,16 @@ fun newsDetailsPager(
                         }
                         .build(),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = ContentScale.Fit,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .blur(3.5.dp)
-                        .alpha(0.9f)
+                        .align(Alignment.Center)
+                        .clip(RoundedCornerShape(16.dp))
+                        .fillMaxWidth(),
+                    onError = { error ->
+                        println("Ошибка загрузки. Проверьте URL и заголовки.")
+                    }
                 )
             }
-            AsyncImage(
-                model = ImageRequest.Builder(LocalPlatformContext.current)
-                    .data(src)
-                    .apply {
-                        headers {
-                            append("User-Agent", "Mozilla/5.0")
-                            append("Referer", "https://vk.com/")
-                        }
-                    }
-                    .build(),
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .clip(RoundedCornerShape(16.dp))
-                    .fillMaxWidth(),
-                onError = { error ->
-                    println("Ошибка загрузки. Проверьте URL и заголовки.")
-                }
-            )
 
             if (attachments.size > 1) {
 

@@ -1,5 +1,6 @@
 package org.example.bigdisplayproject.ui.slider
 
+import VideoPlayerImpl
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -57,6 +58,7 @@ import coil3.request.ImageRequest
 import io.ktor.http.headers
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideImage
+import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.pxToDp
 import java.util.Locale
@@ -118,20 +120,29 @@ fun SlideItem(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalPlatformContext.current)
-                .data(src)
-                .apply {
-                    headers {
-                        append("User-Agent", "Mozilla/5.0")
-                        append("Referer", "https://storage.yandexcloud.net/")
+        if (slideData.mediaContent is SlideImage) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(src)
+                    .apply {
+                        headers {
+                            append("User-Agent", "Mozilla/5.0")
+                            append("Referer", "https://storage.yandexcloud.net/")
+                        }
                     }
-                }
-                .build(),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxWidth()
-        )
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        else if (slideData.mediaContent is SlideVideo) {
+            /*VideoPlayerImpl(
+                url = slideData.mediaContent.videoContent.src,
+                modifier = Modifier
+                    .fillMaxSize()
+            )*/
+        }
         Box(
             modifier = Modifier
                 .fillMaxSize()

@@ -16,6 +16,7 @@ interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
         data class GetNewsById(val id: Long) : Intent
         object Refresh : Intent
         data class UpdateScrollPosition(val position: Int) : Intent
+        data class DownloadFile(val url: String, val outputPath: String): Intent
     }
 
     // Сообщения от executor к reducer
@@ -25,6 +26,7 @@ interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
         data class Error(val message: String) : Message
         object Loading : Message
         data class ScrollPositionUpdated(val position: Int) : Message
+        object FileDownloaded: Message
     }
 
     // Состояние

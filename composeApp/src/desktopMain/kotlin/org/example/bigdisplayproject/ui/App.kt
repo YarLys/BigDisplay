@@ -1,10 +1,12 @@
 package org.example.bigdisplayproject.ui
 
 import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -100,10 +102,6 @@ fun App() {
                         },
                         onScheduleLinkClick = {
                             navController.navigate(Route.Schedule)
-                        },
-                        onDownloadVideo = { url ->
-                            val outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\video1.mp4"
-                            sliderStore.accept(SliderStore.Intent.DownloadFile(url, outputPath))
                         }
                     )
                 }

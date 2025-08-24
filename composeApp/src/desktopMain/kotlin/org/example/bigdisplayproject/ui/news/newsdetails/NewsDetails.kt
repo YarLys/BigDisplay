@@ -63,6 +63,7 @@ import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.News
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
+import org.example.bigdisplayproject.data.remote.dto.news.Video
 import org.example.bigdisplayproject.ui.news.newslist.checkAttachments
 import org.example.bigdisplayproject.ui.news.store.NewsStore
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_BETWEEN
@@ -153,7 +154,7 @@ fun NewsDetails(
                                                 .weight(1f)
                                         ) {
                                             var attachments: MutableList<Attachment> =
-                                                news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" }
+                                                news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" || it.type == "VIDEO"}
                                                     .toMutableList()
                                             if (attachments.isEmpty()) {
                                                 attachments.add(Photo(image = news.image!!))
@@ -166,8 +167,7 @@ fun NewsDetails(
                                                     .fillMaxSize()
                                                     .clip(RoundedCornerShape(16.dp))
                                             ) {
-                                                println()
-                                                newsDetailsPager(pagerState, attachments)
+                                                newsDetailsPager(pagerState, attachments, news.id)
                                             }
                                         }
                                     }

@@ -72,8 +72,8 @@ internal class SliderStoreFactory(
             for (slide in slides) {
                 if (slide.mediaContent is SlideVideo) {
                     val url = slide.mediaContent.videoContent.src
-                    fileNum++
-                    val outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\video${fileNum}.mp4"
+                    fileNum++   // TODO нормальную нумерацию видео
+                    val outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\sliderVideo\\video${fileNum}.mp4"
 
                     downloadFile(url, outputPath)
                 }

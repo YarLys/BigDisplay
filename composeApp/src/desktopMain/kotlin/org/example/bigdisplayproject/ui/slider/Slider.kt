@@ -1,7 +1,10 @@
 package org.example.bigdisplayproject.ui.slider
 
+import VideoPlayerImpl
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -16,6 +19,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
 import org.example.bigdisplayproject.ui.components.BottomPanel
@@ -43,7 +47,6 @@ fun Slider(
     onMenuButtonClick: () -> Unit,
     onNewsLinkClick: (Long) -> Unit,
     onScheduleLinkClick: () -> Unit,
-    onDownloadVideo: (String) -> Unit,
     state: SliderStore.State
 ) {
     Scaffold(
@@ -105,20 +108,19 @@ fun Slider(
                 state.slidesData != null -> {
                     val slides = state.slidesData.importantSlide + state.slidesData.defaultSlide
 
-                    // Необходимо послать Intent по каждому слайду, имеющему видео на фоне, чтобы скачать его
-                    /*for (slide in slides) {
-                        if (slide.mediaContent is SlideVideo) {
-                            onDownloadVideo(slide.mediaContent.videoContent.src)
-                        }
-                    }*/
-
                     SlidesScreen(
                         slides = slides,
                         onNewsLinkClick = onNewsLinkClick,
                         onScheduleLinkClick = onScheduleLinkClick
                     )
                 }
-                else -> {}
+                else -> {
+                    Text(
+                        text = "Новости не найдены",
+                        fontSize = 40.sp,
+                        color = LightWhite
+                    )
+                }
             }
         }
     }
