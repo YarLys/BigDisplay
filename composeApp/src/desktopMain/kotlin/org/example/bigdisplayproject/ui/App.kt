@@ -20,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.example.bigdisplayproject.ui.news.store.NewsStore
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStore
 import org.example.bigdisplayproject.di.koinModule
+import org.example.bigdisplayproject.ui.cursor.store.CursorStore
 import org.example.bigdisplayproject.ui.menu.Menu
 import org.example.bigdisplayproject.ui.news.newsdetails.NewsDetails
 import org.example.bigdisplayproject.ui.news.newslist.NewsList
@@ -43,6 +44,8 @@ fun App() {
     })
 
     MaterialTheme {
+        val cursorStore: CursorStore = getKoin().get()
+
         val newsStore: NewsStore = getKoin().get()
         val newsState by newsStore.stateFlow.collectAsState()
 

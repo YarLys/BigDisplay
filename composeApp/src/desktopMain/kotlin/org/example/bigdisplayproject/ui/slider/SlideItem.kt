@@ -1,5 +1,7 @@
 package org.example.bigdisplayproject.ui.slider
 
+import Speed
+import VideoPlayer
 import VideoPlayerImpl
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -22,12 +24,18 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.FullscreenExit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.RingVolume
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -59,8 +67,10 @@ import io.ktor.http.headers
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideImage
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
+import org.example.bigdisplayproject.ui.components.BottomPanel
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.pxToDp
+import rememberVideoPlayerState
 import java.util.Locale
 
 @Composable
@@ -142,7 +152,77 @@ fun SlideItem(
                 modifier = Modifier
                     .fillMaxSize()
             )*/
+
+/*
+            val state = rememberVideoPlayerState()
+            *//*
+             * Could not use a [Box] to overlay the controls on top of the video.
+             * See https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Swing_Integration
+             * Related issues:
+             * https://github.com/JetBrains/compose-multiplatform/issues/1521
+             * https://github.com/JetBrains/compose-multiplatform/issues/2926
+             *//*
+            Column {
+                VideoPlayer(
+                    url = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4",
+                    state = state,
+                    onFinish = state::stopPlayback,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height((950).pxToDp())
+                        .background(Color.Transparent)
+                )
+                *//*androidx.compose.material3.Slider(
+                    value = state.progress.value.fraction,
+                    onValueChange = { state.seek = it },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Timestamp: ${state.progress.value.timeMillis} ms", modifier = Modifier.width(180.dp))
+                    IconButton(onClick = state::toggleResume) {
+                        Icon(
+                            imageVector = if (state.isResumed) Icons.Filled.Pause else Icons.Filled.PlayArrow,
+                            contentDescription = "Play/Pause",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    IconButton(onClick = state::toggleFullscreen) {
+                        Icon(
+                            imageVector = Icons.Filled.FullscreenExit,
+                            contentDescription = "Toggle fullscreen",
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    Speed(
+                        initialValue = state.speed,
+                        modifier = Modifier.width(104.dp)
+                    ) {
+                        state.speed = it ?: state.speed
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Filled.RingVolume,
+                            contentDescription = "Volume",
+                            modifier = Modifier.size(32.dp)
+                        )
+                        // TODO: Make the slider change volume in logarithmic manner
+                        //  See https://www.dr-lex.be/info-stuff/volumecontrols.html
+                        //  and https://ux.stackexchange.com/q/79672/117386
+                        //  and https://dcordero.me/posts/logarithmic_volume_control.html
+                        androidx.compose.material3.Slider(
+                            value = state.volume,
+                            onValueChange = { state.volume = it },
+                            modifier = Modifier.width(100.dp)
+                        )
+                    }
+                }*//*
+            }*/
         }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()

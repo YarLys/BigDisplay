@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.example.bigdisplayproject.data.remote.NewsClient
 import org.example.bigdisplayproject.data.remote.ScheduleClient
 import org.example.bigdisplayproject.data.remote.SliderClient
+import org.example.bigdisplayproject.data.remote.api.CursorUdpService
 import org.example.bigdisplayproject.data.remote.api.NewsApi
 import org.example.bigdisplayproject.data.remote.api.ScheduleApi
 import org.example.bigdisplayproject.data.remote.api.SliderApi
@@ -12,6 +13,7 @@ import org.example.bigdisplayproject.data.repository.NewsRepository
 import org.example.bigdisplayproject.data.repository.ScheduleRepository
 import org.example.bigdisplayproject.data.repository.SliderRepository
 import org.example.bigdisplayproject.domain.usecases.common.DownloadFileUseCase
+import org.example.bigdisplayproject.domain.usecases.cursor.UpdateCursorUseCase
 import org.example.bigdisplayproject.domain.usecases.news.GetNewsByIdUseCase
 import org.example.bigdisplayproject.domain.usecases.news.GetNewsUseCase
 import org.example.bigdisplayproject.domain.usecases.news.NewsUseCases
@@ -19,6 +21,8 @@ import org.example.bigdisplayproject.domain.usecases.schedule.DownloadCalendarUs
 import org.example.bigdisplayproject.domain.usecases.schedule.GetScheduleUseCase
 import org.example.bigdisplayproject.domain.usecases.schedule.ScheduleUseCases
 import org.example.bigdisplayproject.domain.usecases.slider.GetSlidesUseCase
+import org.example.bigdisplayproject.ui.cursor.CursorManager
+import org.example.bigdisplayproject.ui.cursor.store.CursorStoreFactory
 import org.example.bigdisplayproject.ui.news.store.NewsStoreFactory
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStoreFactory
 import org.example.bigdisplayproject.ui.slider.store.SliderStoreFactory
@@ -35,6 +39,7 @@ val koinModule = module {
     singleOf(::NewsApi)
     singleOf(::ScheduleApi)
     singleOf(::SliderApi)
+    singleOf(::CursorUdpService)
 
     singleOf(::NewsRepository)
     singleOf(::ScheduleRepository)
@@ -54,6 +59,8 @@ val koinModule = module {
     singleOf(::GetScheduleUseCase)
     singleOf(::DownloadCalendarUseCase)
     singleOf(::ScheduleUseCases)
+    singleOf(::CursorManager)
+    singleOf(::UpdateCursorUseCase)
 
     single {
         NewsStoreFactory(
@@ -75,6 +82,13 @@ val koinModule = module {
             storeFactory = DefaultStoreFactory(),
             getSlidesUseCase = get(),
             downloadFileUseCase = get()
+        ).create()
+    }
+
+    single {
+        CursorStoreFactory(
+            storeFactory = DefaultStoreFactory(),
+            updateCursorUseCase = get()
         ).create()
     }
 
