@@ -9,6 +9,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideLink
+import org.example.bigdisplayproject.ui.components.myShadow
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.theme.White2
@@ -83,7 +86,6 @@ fun LinksBlock(
     if (showQrDialog && selectedLink != null) {
         if (!slideData.keyValue.isNullOrEmpty()) {
             if (slideData.keyValue[0].title == "id_news") {
-                // TODO: Проверить переход на экран новостей и выбор новости с этим id
                 onNewsLinkClick(slideData.keyValue[0].value)
             }
         }
@@ -149,6 +151,9 @@ fun LinksBlock(
 
 @Composable
 fun LinkButton(link: SlideLink, onLinkClick: (SlideLink) -> Unit, modifier: Modifier = Modifier) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
+
     Button(
         onClick = {
             onLinkClick(link)
@@ -160,6 +165,13 @@ fun LinkButton(link: SlideLink, onLinkClick: (SlideLink) -> Unit, modifier: Modi
             disabledContainerColor = White2
         ),
         modifier = modifier
+            .hoverable(interactionSource)
+            .myShadow(
+                color = if (isHovered) LightWhite else Transparent,
+                borderRadius = 25.dp,
+                blurRadius = 2.dp,
+                spread = 1.5f.dp
+            )
             .height((50).pxToDp())
     ) {
         Text(

@@ -1,6 +1,5 @@
 package org.example.bigdisplayproject.ui.components
 
-import Progress
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
@@ -13,8 +12,11 @@ import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
+import java.awt.BorderLayout
 import java.awt.Component
 import java.util.*
+import javax.swing.BoxLayout
+import javax.swing.JPanel
 import kotlin.math.roundToInt
 
 @Composable
@@ -25,27 +27,32 @@ fun VideoPlayerNew(
     speed: Float,
     seek: Float,
     isFullscreen: Boolean,
-    progressState: MutableState<Progress>,
     modifier: Modifier,
     onFinish: (() -> Unit)?
 ) {
     val mediaPlayerComponent = remember { initializeMediaPlayerComponent() }
     val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
-    mediaPlayer.emitProgressTo(progressState)
-    mediaPlayer.setupVideoFinishHandler(onFinish)
+    //mediaPlayer.setupVideoFinishHandler(onFinish)
+
+    /*val containerPanel = remember {
+        JPanel().apply {
+            layout = BorderLayout()
+            add(mediaPlayerComponent, BorderLayout.CENTER)
+        }
+    }*/
 
     val factory = remember { { mediaPlayerComponent } }
     /* OR the following code and using SwingPanel(factory = { factory }, ...) */
     // val factory by rememberUpdatedState(mediaPlayerComponent)
 
     LaunchedEffect(url) { mediaPlayer.media().play/*OR .start*/(url) }
-    LaunchedEffect(seek) { mediaPlayer.controls().setPosition(seek) }
+    /*LaunchedEffect(seek) { mediaPlayer.controls().setPosition(seek) }
     LaunchedEffect(speed) { mediaPlayer.controls().setRate(speed) }
     LaunchedEffect(volume) { mediaPlayer.audio().setVolume(volume.toPercentage()) }
     LaunchedEffect(isResumed) { mediaPlayer.controls().setPause(!isResumed) }
     LaunchedEffect(isFullscreen) {
         if (mediaPlayer is EmbeddedMediaPlayer) {
-            /*
+            *//*
              * To be able to access window in the commented code below,
              * extend the player composable function from WindowScope.
              * See https://github.com/JetBrains/compose-jb/issues/176#issuecomment-812514936
@@ -54,14 +61,19 @@ fun VideoPlayerNew(
              * We could also just fullscreen the whole window:
              * `window.placement = WindowPlacement.Fullscreen`
              * See https://github.com/JetBrains/compose-multiplatform/issues/1489
-             */
+             *//*
             // mediaPlayer.fullScreen().strategy(ExclusiveModeFullScreenStrategy(window))
             mediaPlayer.fullScreen().toggle()
         }
-    }
+    }*/
     DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
     SwingPanel(
-        factory = factory,
+        factory = {
+            JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                add(mediaPlayerComponent)
+            }
+        },
         background = Color.Transparent,
         modifier = modifier
     )
@@ -98,26 +110,6 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) {
         }
         events().addMediaPlayerEventListener(listener)
         onDispose { events().removeMediaPlayerEventListener(listener) }
-    }
-}
-
-/**
- * Checks for and emits video progress every 50 milliseconds.
- * Note that it seems vlcj updates the progress only every 250 milliseconds or so.
- *
- * Instead of using `Unit` as the `key1` for [LaunchedEffect],
- * we could use `media().info()?.mrl()` if it's needed to re-launch
- * the effect (for whatever reason) when the url (aka video) changes.
- */
-@Composable
-private fun MediaPlayer.emitProgressTo(state: MutableState<Progress>) {
-    LaunchedEffect(key1 = Unit) {
-        while (isActive) {
-            val fraction = status().position()
-            val time = status().time()
-            state.value = Progress(fraction, time)
-            delay(50)
-        }
     }
 }
 

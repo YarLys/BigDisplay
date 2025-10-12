@@ -1,6 +1,7 @@
 package org.example.bigdisplayproject.ui.menu
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -36,6 +37,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.drawscope.scale
@@ -47,6 +49,7 @@ import androidx.navigation.NavController
 import bigdisplayproject.composeapp.generated.resources.Res
 import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
 import org.example.bigdisplayproject.ui.components.BottomPanel
+import org.example.bigdisplayproject.ui.components.myShadow
 import org.example.bigdisplayproject.ui.navigation.Route
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
@@ -169,32 +172,14 @@ fun MenuCard(
         modifier = modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .hoverable(interactionSource)
             .height(100.dp)
+            .hoverable(interactionSource)
             .graphicsLayer {
                 scaleY = scale
                 transformOrigin = TransformOrigin(0.5f, 0.5f)
                 shape = RoundedCornerShape(30.dp)
                 clip = true
             }
-            .shadow(
-                elevation = if (isHovered) 30.dp else 8.dp,
-                shape = RoundedCornerShape(30.dp),
-                spotColor = if (isHovered) Color.White else Color.Black,
-                ambientColor = if (isHovered) Color.White.copy(alpha = 0.7f) else Color.Black
-            )
-            .shadow(
-                elevation = if (isHovered) 30.dp else 0.dp,
-                shape = RoundedCornerShape(30.dp),
-                spotColor = Color.White.copy(0.9f),
-                ambientColor = Color.White.copy(alpha = 0.4f)
-            )
-            .shadow(
-                elevation = if (isHovered) 30.dp else 0.dp,
-                shape = RoundedCornerShape(30.dp),
-                spotColor = Color.Cyan.copy(alpha = 0.9f),
-                ambientColor = Color.Cyan.copy(alpha = 0.7f)
-            )
             .clickable(
                 interactionSource = interactionSource,
                 indication = null

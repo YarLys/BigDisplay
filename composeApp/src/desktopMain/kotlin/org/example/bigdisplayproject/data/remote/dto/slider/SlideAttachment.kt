@@ -10,7 +10,7 @@ data class SlideAttachment(
     val audio: String?,
     val links: Long?,
     val video: SlideVideo?,
-    val images: List<SlideImage>?,
+    val images: Int?,
     val location: String?,
     val documentation: Long?
 )

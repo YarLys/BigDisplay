@@ -1,6 +1,5 @@
 package org.example.bigdisplayproject.ui.news.newslist
 
-import VideoPlayerImpl
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.hoverable
@@ -30,6 +29,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,6 +45,7 @@ import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.News
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
 import org.example.bigdisplayproject.data.remote.dto.news.Video
+import org.example.bigdisplayproject.ui.components.myShadow
 import org.example.bigdisplayproject.ui.util.Constants.CARD_WIDTH
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.LightWhite
@@ -60,23 +61,11 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
             .padding(8.dp)
             .fillMaxWidth()
             .hoverable(interactionSource)
-            .shadow(
-                elevation = if (isHovered) 24.dp else 8.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = if (isHovered) Color.White else Color.Black,
-                ambientColor = if (isHovered) Color.White.copy(alpha = 0.7f) else Color.Black
-            )
-            .shadow(
-                elevation = if (isHovered) 24.dp else 0.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.White.copy(0.9f),
-                ambientColor = Color.White.copy(alpha = 0.4f)
-            )
-            .shadow(
-                elevation = if (isHovered) 24.dp else 0.dp,
-                shape = RoundedCornerShape(16.dp),
-                spotColor = Color.Cyan.copy(alpha = 0.9f),
-                ambientColor = Color.Cyan.copy(alpha = 0.7f)
+            .myShadow(
+                color = if (isHovered) LightWhite else Transparent,
+                borderRadius = 15.dp,
+                blurRadius = 2.5.dp,
+                spread = 2f.dp
             )
             .clickable(
                 interactionSource = interactionSource,

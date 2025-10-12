@@ -1,8 +1,7 @@
 package org.example.bigdisplayproject.ui.slider
 
-import Speed
+//import VideoPlayer
 import VideoPlayer
-import VideoPlayerImpl
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -44,6 +43,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +52,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.awt.ComposePanel
+import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -64,14 +68,22 @@ import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import io.ktor.http.headers
+import kotlinx.coroutines.delay
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideImage
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
 import org.example.bigdisplayproject.ui.components.BottomPanel
+import org.example.bigdisplayproject.ui.components.myShadow
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.pxToDp
 import rememberVideoPlayerState
+import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
+import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
+import java.awt.Component
 import java.util.Locale
+import javax.swing.BoxLayout
+import javax.swing.JPanel
 
 @Composable
 fun SlideItem(
@@ -95,7 +107,7 @@ fun SlideItem(
         animationSpec = tween(300),
         label = "scaleAnimation"
     )
-    var spacerFlag = false
+    var spacerFlag by mutableStateOf(true)
     var src = ""
     if (slideData.mediaContent is SlideImage) {
         src = slideData.mediaContent.image.src
@@ -145,82 +157,139 @@ fun SlideItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-        else if (slideData.mediaContent is SlideVideo) {
-            /*VideoPlayerImpl(
-                url = slideData.mediaContent.videoContent.src,
-                modifier = Modifier
-                    .fillMaxSize()
+        } else if (slideData.mediaContent is SlideVideo) {
+            /*VideoPlayer(modifier = Modifier.fillMaxWidth().height((950).pxToDp()),
+                url = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4", // Automatically Detect the URL, Wether to Play YouTube Video or .mp4 e.g
+                autoPlay = true,
+                showControls = true,
             )*/
 
-/*
-            val state = rememberVideoPlayerState()
-            *//*
-             * Could not use a [Box] to overlay the controls on top of the video.
-             * See https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Swing_Integration
-             * Related issues:
-             * https://github.com/JetBrains/compose-multiplatform/issues/1521
-             * https://github.com/JetBrains/compose-multiplatform/issues/2926
-             *//*
-            Column {
-                VideoPlayer(
-                    url = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4",
-                    state = state,
-                    onFinish = state::stopPlayback,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height((950).pxToDp())
-                        .background(Color.Transparent)
-                )
-                *//*androidx.compose.material3.Slider(
-                    value = state.progress.value.fraction,
-                    onValueChange = { state.seek = it },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Timestamp: ${state.progress.value.timeMillis} ms", modifier = Modifier.width(180.dp))
-                    IconButton(onClick = state::toggleResume) {
-                        Icon(
-                            imageVector = if (state.isResumed) Icons.Filled.Pause else Icons.Filled.PlayArrow,
-                            contentDescription = "Play/Pause",
-                            modifier = Modifier.size(32.dp)
+            /*val state = rememberVideoPlayerState()
+            VideoPlayer(
+                url = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4",
+                state = state,
+                onFinish = state::stopPlayback,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((950).pxToDp())
+            )*/
+
+            /*val url = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4"
+            val mediaPlayerComponent = initializeMediaPlayerComponent()
+            val mediaPlayer = mediaPlayerComponent.mediaPlayer()
+            val mediaContainer = remember {
+                JPanel().apply {
+                    layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                    add(mediaPlayerComponent)
+                }
+            }
+
+            LaunchedEffect(url) {
+                delay(200)
+                mediaPlayer.media().play(url)
+            }
+            DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
+
+            ComposePanel().apply {
+                setContent {
+                    // 3. Внутри Compose используем Box для слоев
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        // 4. Слой с видео (нижний)
+                        SwingPanel(
+                            modifier = Modifier.matchParentSize(),
+                            factory = { mediaContainer }
                         )
+                        // 5. Слой с элементами управления (верхний)
+                        Row(
+                            modifier = Modifier.align(Alignment.BottomCenter),
+                            horizontalArrangement = Arrangement.SpaceAround
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = "",
+                                tint = LightWhite,
+                                modifier = Modifier
+                                    .size((100).pxToDp())
+                                    .hoverable(leftInteractionSource)
+                                    .graphicsLayer {
+                                        scaleY = leftScale
+                                        scaleX = leftScale
+                                        transformOrigin = TransformOrigin(0.5f, 0.5f)
+                                        clip = true
+                                    }
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                contentDescription = "",
+                                tint = LightWhite,
+                                modifier = Modifier
+                                    .size((100).pxToDp())
+                                    .hoverable(leftInteractionSource)
+                                    .graphicsLayer {
+                                        scaleY = leftScale
+                                        scaleX = leftScale
+                                        transformOrigin = TransformOrigin(0.5f, 0.5f)
+                                        clip = true
+                                    }
+                            )
+                        }
                     }
-                    IconButton(onClick = state::toggleFullscreen) {
-                        Icon(
-                            imageVector = Icons.Filled.FullscreenExit,
-                            contentDescription = "Toggle fullscreen",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                    Speed(
-                        initialValue = state.speed,
-                        modifier = Modifier.width(104.dp)
-                    ) {
-                        state.speed = it ?: state.speed
-                    }
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Filled.RingVolume,
-                            contentDescription = "Volume",
-                            modifier = Modifier.size(32.dp)
-                        )
-                        // TODO: Make the slider change volume in logarithmic manner
-                        //  See https://www.dr-lex.be/info-stuff/volumecontrols.html
-                        //  and https://ux.stackexchange.com/q/79672/117386
-                        //  and https://dcordero.me/posts/logarithmic_volume_control.html
-                        androidx.compose.material3.Slider(
-                            value = state.volume,
-                            onValueChange = { state.volume = it },
-                            modifier = Modifier.width(100.dp)
-                        )
-                    }
-                }*//*
+                }
             }*/
+
+            /*SwingPanel(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height((950).pxToDp()),
+                factory = {
+                    ComposePanel().apply {
+                        setContent {
+                            Box {
+                                SwingPanel(
+                                    modifier = Modifier
+                                        .fillMaxSize(), 
+                                    factory = {
+                                        mediaContainer
+                                    }
+                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceAround
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        contentDescription = "",
+                                        tint = LightWhite,
+                                        modifier = Modifier
+                                            .size((100).pxToDp())
+                                            .hoverable(leftInteractionSource)
+                                            .graphicsLayer {
+                                                scaleY = leftScale
+                                                scaleX = leftScale
+                                                transformOrigin = TransformOrigin(0.5f, 0.5f)
+                                                clip = true
+                                            }
+                                    )
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                        contentDescription = "",
+                                        tint = LightWhite,
+                                        modifier = Modifier
+                                            .size((100).pxToDp())
+                                            .hoverable(leftInteractionSource)
+                                            .graphicsLayer {
+                                                scaleY = leftScale
+                                                scaleX = leftScale
+                                                transformOrigin = TransformOrigin(0.5f, 0.5f)
+                                                clip = true
+                                            }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
+                background = Color.Transparent
+            )*/
         }
 
         Box(
@@ -251,8 +320,8 @@ fun SlideItem(
                     contentDescription = "",
                     tint = LightWhite,
                     modifier = Modifier
-                        .size((100).pxToDp())
                         .hoverable(leftInteractionSource)
+                        .size((100).pxToDp())
                         .graphicsLayer {
                             scaleY = leftScale
                             scaleX = leftScale
@@ -263,14 +332,14 @@ fun SlideItem(
             }
             Column(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxHeight()
                     .padding(
                         top = 50.dp,
                         start = (70).pxToDp(),
                         bottom = (155).pxToDp(),
                         end = (70).pxToDp()
-                    )
-                    .weight(1f),
+                    ),
                 verticalArrangement = verticalArrangement,
                 horizontalAlignment = horizontalAlignment
             ) {
@@ -280,7 +349,8 @@ fun SlideItem(
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White,
                     modifier = Modifier
-                        .align(headingAlignment)
+                        .align(headingAlignment),
+                    lineHeight = 52.sp
                 )
                 Spacer(modifier = Modifier.height((50).pxToDp()))
                 Row(
@@ -375,4 +445,34 @@ fun SlideItem(
             }
         }
     }
+}
+
+
+
+
+
+
+
+
+// TODO: FOR TEST, MB DELETE
+private fun initializeMediaPlayerComponent(): Component {
+    NativeDiscovery().discover()
+    return if (isMacOS()) {
+        CallbackMediaPlayerComponent()
+    } else {
+        EmbeddedMediaPlayerComponent()
+    }
+}
+
+private fun Component.mediaPlayer() = when (this) {
+    is CallbackMediaPlayerComponent -> mediaPlayer()
+    is EmbeddedMediaPlayerComponent -> mediaPlayer()
+    else -> error("mediaPlayer() can only be called on vlcj player components")
+}
+
+private fun isMacOS(): Boolean {
+    val os = System
+        .getProperty("os.name", "generic")
+        .lowercase(Locale.ENGLISH)
+    return "mac" in os || "darwin" in os
 }

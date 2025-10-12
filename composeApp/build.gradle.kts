@@ -40,15 +40,16 @@ kotlin {
             // QR Code generator
             implementation("com.google.zxing:core:3.5.1")
             implementation("com.google.zxing:javase:3.5.1")
+
             // Video player
-            implementation("uk.co.caprica:vlcj:4.7.0")
+            //implementation("uk.co.caprica:vlcj:4.7.0")
+            //implementation(libs.alert.kmp)
+
             // Navigation
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
             // Coil
             implementation(libs.coil.compose.core)
             implementation(libs.coil.mp)
-            //implementation(libs.coil.network.ktor2)
-            //implementation(libs.coil.network.ktor3)
             implementation(libs.coil.network.ktor)
             implementation(libs.coil.compose)
             // MVIKotlin
@@ -65,12 +66,26 @@ kotlin {
             // Koin (DI)
             implementation("io.insert-koin:koin-core:3.5.6")
             implementation("io.insert-koin:koin-compose:1.1.0")
+
+            /*implementation("org.openjfx:javafx-controls:17.0.16")
+            implementation("org.openjfx:javafx-graphics:17.0.16")
+            implementation("org.openjfx:javafx-fxml:17.0.16")*/
+            /*val fxSuffix = "win"
+            implementation("org.openjfx:javafx-base:17:${fxSuffix}")
+            implementation("org.openjfx:javafx-graphics:17:${fxSuffix}")
+            implementation("org.openjfx:javafx-controls:17:${fxSuffix}")
+            implementation("org.openjfx:javafx-swing:17:${fxSuffix}")
+            implementation("org.openjfx:javafx-web:17:${fxSuffix}")
+            implementation("org.openjfx:javafx-media:17:${fxSuffix}")*/
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
 
+            // VideoPlayer
             implementation("uk.co.caprica:vlcj:4.7.0")
+
+            //implementation("io.github.khubaibkhan4:mediaplayer-kmp:2.0.9")
         }
     }
 }

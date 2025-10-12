@@ -47,7 +47,7 @@ class CursorManager {
     fun setCustomCursor(icon: BufferedImage) {
         // Установка кастомного курсора TODO
         // Реализация зависит от платформы (AWT/JavaFX)
-        try {
+        /*try {
             val cursor = Toolkit.getDefaultToolkit().createCustomCursor(
                 icon,
                 Point(0, 0),
@@ -57,7 +57,7 @@ class CursorManager {
             // В реальной реализации нужно получить главное окно приложения
         } catch (e: Exception) {
             println("Error in establishing custom cursor: ${e.message}")
-        }
+        }*/
     }
 
     fun dispose() {

@@ -2,20 +2,17 @@ package org.example.bigdisplayproject.ui.schedule
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -25,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -45,7 +41,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -59,21 +54,19 @@ import org.example.bigdisplayproject.ui.schedule.store.ScheduleStore
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlinx.coroutines.launch
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color.Companion.Transparent
 import org.example.bigdisplayproject.domain.usecases.schedule.CalendarEvent
 import org.example.bigdisplayproject.ui.components.BottomPanel
+import org.example.bigdisplayproject.ui.components.Scroller
+import org.example.bigdisplayproject.ui.components.myShadow
+import org.example.bigdisplayproject.ui.components.verticalScrollbar
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.example.bigdisplayproject.ui.theme.GradientColor1
@@ -94,7 +87,6 @@ import org.example.bigdisplayproject.ui.theme.GradientColor9
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton1
 import org.example.bigdisplayproject.ui.theme.LinearGradientButton2
-import org.example.bigdisplayproject.ui.util.Scroller
 import java.io.File
 import java.time.DayOfWeek
 import java.time.ZoneId
@@ -149,28 +141,16 @@ fun Schedule(
 
                         Card(
                             modifier = Modifier
-                                .padding(8.dp)
                                 .fillMaxWidth()
                                 .height((150).pxToDp())
-                                .shadow(
-                                    elevation = 24.dp,
-                                    shape = RoundedCornerShape(24.dp),
-                                    spotColor = Color.White,
-                                    ambientColor = Color.White.copy(alpha = 0.7f)
+                                .myShadow(
+                                    color = LightWhite,
+                                    borderRadius = 38.dp,
+                                    blurRadius = 2.dp,
+                                    spread = 3f.dp
                                 )
-                                .shadow(
-                                    elevation = 24.dp,
-                                    shape = RoundedCornerShape(24.dp),
-                                    spotColor = Color.White.copy(0.9f),
-                                    ambientColor = Color.White.copy(alpha = 0.4f)
-                                )
-                                .shadow(
-                                    elevation = 24.dp,
-                                    shape = RoundedCornerShape(24.dp),
-                                    spotColor = Color.Cyan.copy(alpha = 0.9f),
-                                    ambientColor = Color.Cyan.copy(alpha = 0.7f)
-                                ),
-                            shape = RoundedCornerShape(16.dp),
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(26.dp)),
                             colors = CardDefaults.cardColors(
                                 containerColor = LightWhite,
                                 contentColor = MaterialTheme.colorScheme.onSurface
@@ -210,7 +190,7 @@ fun Schedule(
                                     }
                                 }
                             },
-                            modifier = Modifier.padding((10).pxToDp())
+                            modifier = Modifier.padding(8.dp)
                         )
                     }
                 }
@@ -266,12 +246,17 @@ fun Schedule(
                         }
 
                         state.filteredEvents != null -> {
+                            val scrollState = rememberLazyListState()
                             LazyColumn(
                                 modifier = Modifier
                                     .padding(
                                         bottom = (269).pxToDp(),
                                         end = (80).pxToDp()
                                     )
+                                .verticalScrollbar(
+                                    state = scrollState
+                                ),
+                                state = scrollState
                             ) {
                                 items(state.filteredEvents) { event ->
                                     ScheduleCard(event)
@@ -287,19 +272,28 @@ fun Schedule(
                                     ),
                                 horizontalArrangement = Arrangement.spacedBy((32).pxToDp())
                             ) {
-                                val interactionSource = remember { MutableInteractionSource() }
+                                val interactionSourceLeft = remember { MutableInteractionSource() }
+                                val interactionSourceRight = remember { MutableInteractionSource() }
+                                val isLeftHovered by interactionSourceLeft.collectIsHoveredAsState()
+                                val isRightHovered by interactionSourceRight.collectIsHoveredAsState()
 
                                 // В этом решении иконка внутри box не центрируется относительно своего "рисунка", а делает это по границам
                                 // Пока что решено просто её сдвинуть. Проблема в самой иконке почему-то, либо я чего-то не понимаю.
                                 Box(
                                     modifier = Modifier
+                                        .myShadow(
+                                            color = if (isLeftHovered) LightWhite else Transparent,
+                                            borderRadius = 50.dp,
+                                            blurRadius = 2.dp,
+                                            spread = 1.5f.dp
+                                        )
                                         .size((80).pxToDp())
                                         .background(
                                             color = LightWhite,
                                             shape = RoundedCornerShape(50)
                                         )
                                         .clickable(
-                                            interactionSource = interactionSource,
+                                            interactionSource = interactionSourceLeft,
                                             indication = null
                                         ) {
                                             currentDate = currentDate.minusDays(1)
@@ -363,13 +357,19 @@ fun Schedule(
 
                                 Box(
                                     modifier = Modifier
+                                        .myShadow(
+                                            color = if (isRightHovered) LightWhite else Transparent,
+                                            borderRadius = 50.dp,
+                                            blurRadius = 2.dp,
+                                            spread = 1.5f.dp
+                                        )
                                         .size((80).pxToDp())
                                         .background(
                                             color = LightWhite,
                                             shape = RoundedCornerShape(50)
                                         )
                                         .clickable(
-                                            interactionSource = interactionSource,
+                                            interactionSource = interactionSourceRight,
                                             indication = null
                                         ) {
                                             currentDate = currentDate.plusDays(1)
@@ -392,28 +392,6 @@ fun Schedule(
                                         tint = DarkGray
                                     )
                                 }
-
-                                /*IconButton(
-                                    onClick = {
-                                        val calendar = Calendar.getInstance().apply {
-                                            time = currentDate
-                                            add(Calendar.DAY_OF_YEAR, 1)
-                                        }
-                                        currentDate = calendar.time
-                                    },
-                                    modifier = Modifier
-                                        .size((80).pxToDp())
-                                        .background(
-                                            color = LightWhite,
-                                            shape = RoundedCornerShape(50)
-                                        )
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                                        contentDescription = "Next date",
-                                        tint = DarkGray
-                                    )
-                                }*/
                             }
                         }
 
@@ -470,6 +448,7 @@ fun GradientButton(
     modifier: Modifier = Modifier
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val isHovered by interactionSource.collectIsHoveredAsState()
 
     Button(
         onClick = { onClick(symbol) },
@@ -484,6 +463,13 @@ fun GradientButton(
         elevation = null,
         border = null,
         modifier = modifier
+            .hoverable(interactionSource)
+            .myShadow(
+                color = if (isHovered) LightWhite else Transparent,
+                borderRadius = 25.dp,
+                blurRadius = 2.dp,
+                spread = 1.5f.dp
+            )
             .size((115).pxToDp())
             .clickable(
                 interactionSource = interactionSource,
@@ -493,6 +479,10 @@ fun GradientButton(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    color = DarkGray,
+                    shape = RoundedCornerShape(25.dp)
+                )
                 .background(
                     brush = Brush.linearGradient(
                         colors = listOf(
@@ -530,7 +520,8 @@ fun ButtonGrid(
         columns = GridCells.Fixed(5),
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy((10).pxToDp()),
-        horizontalArrangement = Arrangement.spacedBy((10).pxToDp())
+        horizontalArrangement = Arrangement.spacedBy((10).pxToDp()),
+        contentPadding = PaddingValues(5.dp)
     ) {
         items(symbols) { symbol ->
             GradientButton(
