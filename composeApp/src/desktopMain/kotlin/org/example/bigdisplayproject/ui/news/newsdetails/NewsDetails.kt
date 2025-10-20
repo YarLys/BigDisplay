@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
-import org.example.bigdisplayproject.ui.news.newslist.checkAttachments
 import org.example.bigdisplayproject.ui.news.store.NewsStore
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_BETWEEN
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT
@@ -132,23 +131,19 @@ fun NewsDetails(
                                         .padding(CARD_DETAIL_PADDING.pxToDp()),
                                     horizontalArrangement = Arrangement.spacedBy(CARD_DETAIL_BETWEEN.pxToDp())
                                 ) {
+                                    // Добавим в Pager news.image. Маленькое изображение по типу логотипа ИИТ не отображаем
+                                    val attachments = mutableListOf<Attachment>()
+                                    if (news.image != null && !(news.image.width == news.image.height && news.image.height < 400)) {
+                                        attachments.add(Photo(image = news.image))
+                                    }
+                                    // Добавим все подходящие элементы из news.attachments
+                                    attachments.addAll(news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" || it.type == "VIDEO"})
 
-                                    // маленькое изображение по типу логотипа ИИТ не отображаем
-                                    val attachment = checkAttachments(news)
-                                    if ((news.image != null && !(news.image.width == news.image.height && news.image.height < 400))
-                                        || attachment != null
-                                    ) {
+                                    if (attachments.isNotEmpty()) {
                                         Column(
                                             modifier = Modifier
                                                 .weight(1f)
                                         ) {
-                                            var attachments: MutableList<Attachment> =
-                                                news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" || it.type == "VIDEO"}
-                                                    .toMutableList()
-                                            if (attachments.isEmpty()) {
-                                                attachments.add(Photo(image = news.image!!))
-                                            }
-
                                             var pagerState =
                                                 rememberPagerState(pageCount = { attachments.size })
                                             Box(

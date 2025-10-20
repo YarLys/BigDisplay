@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,8 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
@@ -82,7 +79,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                 .fillMaxSize()
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Top // if (hasImage) Arrangement.Top else Arrangement.Center
+            verticalArrangement = Arrangement.Top
         ) {
             Box(
                 modifier = Modifier
@@ -90,71 +87,7 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
                     .clip(RoundedCornerShape(8.dp)),
                 contentAlignment = Alignment.Center
             ) {
-                val attachment = checkAttachments(news)
-                if (news.image != null || (attachment != null && attachment !is Video)) {
-                    var src = ""
-                    var imageWidth = 0
-                    if (attachment != null) {
-                        when (attachment) {
-                            is Photo -> {
-                                src = attachment.image.src
-                                imageWidth = attachment.image.width.toInt()
-                            }
-
-                            is Link -> {
-                                src = attachment.image.src
-                                imageWidth = attachment.image.width.toInt()
-                            }
-
-                            else -> {
-                                src = ""
-                            } // because here no other options
-                        }
-                    } else {
-                        src = news.image!!.src
-                        imageWidth = news.image.width.toInt()
-                    }
-
-                    if (imageWidth.pxToDp() <= (CARD_WIDTH - 30).dp) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalPlatformContext.current)
-                                .data(src)
-                                .apply {
-                                    headers {
-                                        append("User-Agent", "Mozilla/5.0")
-                                        append("Referer", "https://vk.com/")
-                                    }
-                                }
-                                .build(),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .blur(3.dp)
-                                .alpha(0.9f)
-                        )
-                    }
-                    AsyncImage(
-                        model = ImageRequest.Builder(LocalPlatformContext.current)
-                            .data(src)
-                            .apply {
-                                headers {
-                                    append("User-Agent", "Mozilla/5.0")
-                                    append("Referer", "https://vk.com/")
-                                }
-                            }
-                            .build(),
-                        contentDescription = null,
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        onError = { error ->
-                            println("Ошибка загрузки. Проверьте URL и заголовки.")
-                        }
-                    )
-                } else {
-                    Image(painterResource(Res.drawable.zaglushka_svg), null)
-                }
+                ShowImagePreview(news)
             }
             Spacer(modifier = Modifier.height((20).pxToDp()))
             Text(
@@ -170,11 +103,75 @@ fun NewsCard(news: News, onItemClick: (Long) -> Unit) {
     }
 }
 
-fun checkAttachments(news: News): Attachment? {
-    for (attachment in news.attachments) {
-        if (attachment.type == "PHOTO" || attachment.type == "LINK" /*|| attachment.type == "VIDEO"*/) {
-            return attachment
+@Composable
+fun ShowImagePreview(
+    news: News
+) {
+    val attachments = news.attachments.filter { it.type == "PHOTO" || it.type == "LINK" }
+    var src = ""
+    var imageWidth = 0
+    if (attachments.isNotEmpty()) {
+        val attachment = attachments[0]
+        when (attachment) {
+            is Photo -> {
+                src = attachment.image.src
+                imageWidth = attachment.image.width.toInt()
+            }
+
+            is Link -> {
+                src = attachment.image.src
+                imageWidth = attachment.image.width.toInt()
+            }
+            else -> {   // но в данном случае attachment только photo или link
+                src = ""
+            }
         }
     }
-    return null
+    else if (news.image != null) {
+        src = news.image.src
+        imageWidth = news.image.width.toInt()
+    }
+
+    if (src != "") {
+        if (imageWidth.pxToDp() <= (CARD_WIDTH - 30).dp) {
+            AsyncImage(
+                model = ImageRequest.Builder(LocalPlatformContext.current)
+                    .data(src)
+                    .apply {
+                        headers {
+                            append("User-Agent", "Mozilla/5.0")
+                            append("Referer", "https://vk.com/")
+                        }
+                    }
+                    .build(),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .blur(3.dp)
+                    .alpha(0.9f)
+            )
+        }
+        AsyncImage(
+            model = ImageRequest.Builder(LocalPlatformContext.current)
+                .data(src)
+                .apply {
+                    headers {
+                        append("User-Agent", "Mozilla/5.0")
+                        append("Referer", "https://vk.com/")
+                    }
+                }
+                .build(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier
+                .fillMaxWidth(),
+            onError = { error ->
+                println("Ошибка загрузки. Проверьте URL и заголовки.")
+            }
+        )
+    }
+    else {
+        Image(painterResource(Res.drawable.zaglushka_svg), null)
+    }
 }

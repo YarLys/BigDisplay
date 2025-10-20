@@ -1,6 +1,5 @@
 package org.example.bigdisplayproject.ui.news.newsdetails
 
-import VideoPlayerImpl
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
@@ -24,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -45,6 +45,8 @@ import org.example.bigdisplayproject.data.remote.dto.news.Attachment
 import org.example.bigdisplayproject.data.remote.dto.news.Link
 import org.example.bigdisplayproject.data.remote.dto.news.Photo
 import org.example.bigdisplayproject.data.remote.dto.news.Video
+import org.example.bigdisplayproject.ui.components.videoplayer.VideoPlayer
+import org.example.bigdisplayproject.ui.components.videoplayer.rememberVideoPlayerState
 import org.example.bigdisplayproject.ui.theme.LightWhite
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_HEIGHT
 import org.example.bigdisplayproject.ui.util.Constants.CARD_DETAIL_WIDTH
@@ -83,20 +85,28 @@ fun newsDetailsPager(
                 }
 
                 is Video -> {
-                    src = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\newsVideo\\video${newsId}.mp4"
+                    src = "https://vk.com/clip${attachment.objectId}_${attachment.ownedId}"
+                    //src = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4"
                 }
 
                 else -> {}
             }
             if (attachment is Video) {
-                VideoPlayerImpl(
-                    url = src,
+                val videoPlayerState = rememberVideoPlayerState()
+                VideoPlayer(
+                    mrl = src,
+                    state = videoPlayerState,
                     modifier = Modifier
                         .align(Alignment.Center)
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = Color.Transparent, shape = RoundedCornerShape(16.dp))
                         .fillMaxSize()
                 )
+                LaunchedEffect(src) {
+                    videoPlayerState.doWithMediaPlayer { mediaPlayer ->
+                        mediaPlayer.play()
+                    }
+                }
             } else {
                 if (shouldApplyBlur(
                         IntSize(width = imageWidth, height = imageHeight),
@@ -105,7 +115,7 @@ fun newsDetailsPager(
                             height = CARD_DETAIL_HEIGHT.dp.dpToPx().toInt()
                         )
                     )
-                ) { // небольшой нюанс
+                ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalPlatformContext.current)
                             .data(src)

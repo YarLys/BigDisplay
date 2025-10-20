@@ -84,6 +84,8 @@ kotlin {
 
             // VideoPlayer
             implementation("uk.co.caprica:vlcj:4.7.0")
+            implementation("org.jetbrains.compose.ui:ui-graphics:1.1.1")
+            implementation("uk.co.caprica:vlcj:4.8.2")
 
             //implementation("io.github.khubaibkhan4:mediaplayer-kmp:2.0.9")
         }
