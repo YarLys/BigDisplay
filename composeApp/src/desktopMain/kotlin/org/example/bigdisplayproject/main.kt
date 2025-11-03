@@ -9,11 +9,6 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import org.example.bigdisplayproject.ui.App
-import java.awt.Cursor
-import java.awt.Point
-import java.awt.Toolkit
-import java.io.File
-import javax.imageio.ImageIO
 
 fun main() = application {
     Window(
@@ -28,14 +23,6 @@ fun main() = application {
             App()
         }
     }
-}
-
-private fun setCustomCursor(): Cursor {
-    return Toolkit.getDefaultToolkit().createCustomCursor(
-        ImageIO.read(File("D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\composeApp\\src\\commonMain\\composeResources\\drawable\\customCursorMove.png")),
-        Point(0, 0),
-        "custom_cursor"
-    )
 }
 
 // TODO: Если будете использовать KMP WebView, необходимо настроить KCEF
