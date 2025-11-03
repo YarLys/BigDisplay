@@ -17,6 +17,7 @@ import androidx.navigation.toRoute
 import com.arkivanov.mvikotlin.extensions.coroutines.stateFlow
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import org.example.bigdisplayproject.ui.news.store.NewsStore
 import org.example.bigdisplayproject.ui.schedule.store.ScheduleStore
 import org.example.bigdisplayproject.di.koinModule
@@ -60,7 +61,14 @@ fun App() {
             initialFirstVisibleItemIndex = newsState.scrollPosition,
             initialFirstVisibleItemScrollOffset = newsState.scrollPosition + 1
         )
+        LaunchedEffect(newsState.scrollPosition) {
+            if (newsState.scrollPosition != listState.firstVisibleItemIndex) {
+                listState.scrollToItem(newsState.scrollPosition)
+            }
+        }
         LaunchedEffect(listState.isScrollInProgress) {
+            // Это для того, чтобы NewsList сохранял ScrollState
+            // после просмотра какой-то конкретной новости (переход на NewsDetails)
             snapshotFlow {
                 listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
             }.collect { position ->
@@ -135,22 +143,13 @@ fun App() {
                         listState = listState,
                         onItemClick = { id ->
                             newsStore.accept(NewsStore.Intent.GetNewsById(id))  // предзагружаем данные
-                            navController.navigate(Route.NewsDetail(id)) {
-                                popUpTo(Route.NewsList) {
-                                    saveState = true
-                                }
-                                restoreState = true
-                            }
+                            navController.navigate(Route.NewsDetail(id)) {}
                         },
                         onButtonClick = {
-                            navController.navigateUp()
-                            // TODO: Не понимаю, почему не работает. Нужно, чтобы при следующем заходе новости отображались сначала
+                            // При выходе обнуляем значение скролла
                             newsStore.accept(NewsStore.Intent.UpdateScrollPosition(0))
-                        },
-                        /*isRefreshing = false,
-                        onRefresh = {
-                            store.accept(NewsStore.Intent.Refresh)
-                        },*/
+                            navController.navigateUp()
+                        }
                     )
                 }
                 dialog<Route.NewsDetail>(

@@ -16,15 +16,6 @@ import java.io.File
 import javax.imageio.ImageIO
 
 fun main() = application {
-    /*System.setProperty("compose.interop.blending", "true")
-    System.setProperty("compose.swing.render.on.graphics", "true")*/
-
-    /*System.setProperty("prism.order", "sw") // программный рендеринг
-    System.setProperty("prism.verbose", "true")
-    // Явно указываем путь к JavaFX модулям
-    val javaHome = System.getProperty("java.home")
-    val javafxPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\javafx-sdk-17.0.16\\lib"
-*/
     Window(
         onCloseRequest = ::exitApplication,
         title = "BigDisplayProject",
@@ -33,12 +24,7 @@ fun main() = application {
         },
         undecorated = true
     ) {
-        Box(
-            modifier = Modifier
-                .pointerHoverIcon(
-                    PointerIcon(setCustomCursor())
-                )
-        ) {
+        Box {
             App()
         }
     }
@@ -51,3 +37,113 @@ private fun setCustomCursor(): Cursor {
         "custom_cursor"
     )
 }
+
+// TODO: Если будете использовать KMP WebView, необходимо настроить KCEF
+/*
+private fun TryKCEFInit() {
+    var kcefInitialized by remember { mutableStateOf(false) }
+    var kcefError by remember { mutableStateOf<String?>(null) }
+    var showKCEFUI by remember { mutableStateOf(false) }
+
+    val bundleLocation = System.getProperty("compose.application.resources.dir")?.let { File(it) } ?: File(".")
+    // Инициализация KCEF после создания окна
+    LaunchedEffect(Unit) {
+        try {
+            withContext(Dispatchers.IO) {
+                KCEF.init(
+                    builder = {
+                        installDir(File(bundleLocation, "kcef-bundle")) // recommended, but not necessary
+
+                        progress {
+                            onDownloading {
+                                // use this if you want to display a download progress for example
+                                println("KCEF INIT: $it%")
+                            }
+                            onInitialized {
+                                println("KCEF INIT: DONE")
+                                /*kcefInitialized = true
+                                showKCEFUI = true*/
+                                println("KCEF INIT: SUCCESS")
+                            }
+                        }
+                    },
+                    onRestartRequired = {
+                        // all required CEF packages downloaded but the application needs a restart to load them (unlikely to happen)
+                        println("KCEF INIT: Restart is required.")
+                    },
+                    onError = { error ->
+                        //kcefError = "KCEF ERROR: ${error?.message}"
+                        println("KCEF ERROR: ${error?.message}")
+                    }
+                )
+            }
+        } catch (e: Exception) {
+            //kcefError = "KCEF EXCEPTION: ${e.message}"
+            //showKCEFUI = true // Все равно показываем UI
+            println("KCEF EXCEPTION: ${e.message}")
+        }
+        println("DEBUG 1")
+    }
+    println("DEBUG 2")
+    LaunchedEffect (kcefInitialized) {
+        println("KCEF INITIALIZED")
+        withContext(Dispatchers.IO) {
+            KCEF.newClient()
+        }
+    }
+
+
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "BigDisplayProject",
+        state = rememberWindowState().apply {
+            placement = WindowPlacement.Fullscreen
+        },
+        undecorated = true
+    ) {
+        if (showKCEFUI && kcefInitialized) {
+            // Показываем ваш основной UI только когда KCEF готов
+            Box(
+                modifier = Modifier
+                    .pointerHoverIcon(
+                        PointerIcon(setCustomCursor())
+                    )
+            ) {
+                App()
+            }
+        } else {
+            // Показываем загрузочный экран
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (kcefError != null) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Ошибка KCEF:", color = Color.Red)
+                        Text(kcefError!!, color = Color.Red)
+                        Button(onClick = { showKCEFUI = true }) {
+                            Text("Продолжить без KCEF")
+                        }
+                    }
+                } else if (!kcefInitialized) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text("Инициализация KCEF...")
+                        CircularProgressIndicator()
+                        Button(
+                            onClick = {
+                                kcefError = "KCEF пропущен"
+                                showKCEFUI = true
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                backgroundColor = Color.LightGray
+                            )
+                        ) {
+                            Text("Пропустить KCEF")
+                        }
+                    }
+                }
+            }
+        }
+
+ }
+ */

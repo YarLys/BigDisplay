@@ -7,6 +7,10 @@ class VideoPlayerState {
     private var mediaPlayer: MediaPlayer? = null
     private val defferredEffects = mutableListOf<(MediaPlayer) -> Unit>()
 
+    fun isMediaPlayerReady(): Boolean {
+        return mediaPlayer?.isPlaying == true
+    }
+
     fun doWithMediaPlayer(block: (MediaPlayer) -> Unit) {
         mediaPlayer?.let {
             block(it)

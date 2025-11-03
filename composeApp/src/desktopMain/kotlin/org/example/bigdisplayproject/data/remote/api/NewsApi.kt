@@ -18,7 +18,7 @@ class NewsApi(
     suspend fun getNews(): Result<List<News>, NetworkError> {
         val response = try {
             httpClient.get(
-                urlString = "http://194.67.93.15:45455/api/v1/wall" // спрятать в gradle или куда-то, где будет безопасно
+                urlString = "http://194.67.93.15:45455/api/v1/wall" // в идеале спрятать куда-то, где будет безопасно
             ) {}
         } catch (e: UnresolvedAddressException) {
             return Result.Error(NetworkError.NO_INTERNET)

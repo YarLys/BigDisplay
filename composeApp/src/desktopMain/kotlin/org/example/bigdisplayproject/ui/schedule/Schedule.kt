@@ -172,7 +172,6 @@ fun Schedule(
                         ButtonGrid(
                             symbols = buttonSymbols,
                             onButtonClick = { symbol ->
-                                println("Pressed button: $symbol")
                                 when (symbol) {
                                     "<" -> {
                                         if (group.value.isNotEmpty()) {
@@ -253,9 +252,10 @@ fun Schedule(
                                         bottom = (269).pxToDp(),
                                         end = (80).pxToDp()
                                     )
-                                .verticalScrollbar(
-                                    state = scrollState
-                                ),
+                                    .verticalScrollbar(
+                                        state = scrollState,
+                                        apply = state.filteredEvents.size > 2
+                                    ),
                                 state = scrollState
                             ) {
                                 items(state.filteredEvents) { event ->

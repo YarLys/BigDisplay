@@ -25,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -129,37 +130,45 @@ fun SlideItem(
             )
         } else if (slideData.mediaContent is SlideVideo) {
 
-            //val videoSrc = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4"
-            //val videoSrc = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\sliderVideo\\video1.mp4"
             val videoSrc = slideData.mediaContent.videoContent.src
-
             val videoPlayerState = rememberVideoPlayerState()
+            var isPlayerLoading by remember { mutableStateOf(true) }
+
             VideoPlayer(
                 mrl = videoSrc,
                 state = videoPlayerState,
                 modifier = Modifier.fillMaxWidth()
             )
+
+            if (isPlayerLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(50.dp)
+                    )
+                }
+            }
+
             LaunchedEffect(videoSrc) {
                 videoPlayerState.doWithMediaPlayer { mediaPlayer ->
                     mediaPlayer.play()
                 }
+                isPlayerLoading = !isPlayerLoading
             }
-            /*LaunchedEffect(videoSrc) {
-                videoPlayerState.doWithMediaPlayer { mediaPlayer ->
-                    mediaPlayer.addOnTimeChangedListener(
-                        object : OnTimeChangedListener {
-                            override fun onTimeChanged(timeMillis: Long) {
-                            }
-                        }
-                    )
-                }
-            }*/
+
+            LaunchedEffect(videoPlayerState.isMediaPlayerReady()) {
+                isPlayerLoading = !isPlayerLoading
+            }
         }
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
+                .background(Color.Black.copy(alpha = 0.2f))
         )
 
         Row(

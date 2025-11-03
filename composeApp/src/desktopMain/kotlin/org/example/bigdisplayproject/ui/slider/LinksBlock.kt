@@ -89,7 +89,7 @@ fun LinksBlock(
                 onNewsLinkClick(slideData.keyValue[0].value)
             }
         }
-        else if (selectedLink != null && selectedLink!!.link.contains("schedule")) {
+        else if (selectedLink != null && selectedLink!!.link.contains("schedule")) {  // TODO: не проверить данный сценарий из-за отсутствия подходящих новостей в слайдере
             onScheduleLinkClick()
         }
         else {

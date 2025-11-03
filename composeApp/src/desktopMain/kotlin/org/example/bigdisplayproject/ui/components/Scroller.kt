@@ -103,9 +103,12 @@ fun Scroller(
 @Composable
 fun Modifier.verticalScrollbar(
     state: LazyListState,
+    apply: Boolean = false,
     alpha: Float = 1f,
     width: Dp = 8.dp
 ): Modifier {
+    if (!apply) return this
+
     val scope = rememberCoroutineScope()
     val scrollbarColor = DarkGray.copy(alpha = 0.5f * alpha)
     val thumbColor = DarkGray.copy(alpha = alpha)
@@ -123,6 +126,7 @@ fun Modifier.verticalScrollbar(
                 val totalItemsHeight = layoutInfo.visibleItemsInfo.sumOf { it.size }
                 val totalItemsCount = layoutInfo.totalItemsCount
                 val visibleItemsCount = layoutInfo.visibleItemsInfo.size
+
                 val avgItemHeight = if (visibleItemsCount > 0) {
                     totalItemsHeight.toFloat() / visibleItemsCount
                 } else 0f

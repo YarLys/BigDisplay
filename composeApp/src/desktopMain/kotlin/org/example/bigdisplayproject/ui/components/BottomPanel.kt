@@ -13,8 +13,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,9 +29,7 @@ import org.example.bigdisplayproject.ui.util.Constants.BOTTOM_PANEL_ICONS_SPACE
 import org.example.bigdisplayproject.ui.util.pxToDp
 import org.example.bigdisplayproject.ui.theme.DarkGray
 import org.jetbrains.compose.resources.painterResource
-import bigdisplayproject.composeapp.generated.resources.iit_logo
 import bigdisplayproject.composeapp.generated.resources.iit_logo_svg
-import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo
 import bigdisplayproject.composeapp.generated.resources.rtuitlab_logo_svg
 import bigdisplayproject.composeapp.generated.resources.separator
 import kotlinx.datetime.LocalDate
@@ -47,17 +46,14 @@ fun BottomPanel(
     text: String = "Назад",
     icon: ImageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft
 ) {
-    val currentTime = remember { mutableStateOf(getCurrentTime()) }
-    val currentLabel = remember { mutableStateOf(getLabelText()) }
-    val currentWeek = remember { mutableStateOf(getCurrentWeek(currentTime.value)) }
-    LaunchedEffect(Unit) {
+    val currentTime by produceState(initialValue = getCurrentTime()) {
         while (true) {
             delay(1000)
-            currentTime.value = getCurrentTime()
-            currentLabel.value = getLabelText()
-            currentWeek.value = getCurrentWeek(currentTime.value)
+            value = getCurrentTime()
         }
     }
+    val currentLabel by remember { derivedStateOf { getLabelText() } }
+    val currentWeek by remember { derivedStateOf { getCurrentWeek(currentTime) } }
 
     Surface(
         color = DarkGray,
@@ -100,19 +96,19 @@ fun BottomPanel(
             ) {
                 Column {
                     Text(
-                        currentLabel.value,
+                        currentLabel,
                         style = MaterialTheme.typography.bodyMedium,
                         color = LightWhite
                     )
                     Text(
-                        text = currentWeek.value,
+                        text = currentWeek,
                         style = MaterialTheme.typography.bodyMedium,
                         color = LightWhite
                     )
                 }
 
                 Text(
-                    text = currentTime.value.substring(0, 9),
+                    text = currentTime.substring(0, 9),
                     style = MaterialTheme.typography.headlineMedium,
                     color = LightWhite
                 )

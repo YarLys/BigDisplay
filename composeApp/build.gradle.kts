@@ -30,8 +30,8 @@ kotlin {
             implementation("joda-time:joda-time:2.12.5")
             // Дата/время для KMP
             implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-
-            implementation(compose.materialIconsExtended) // For icons
+            // For icons
+            implementation(compose.materialIconsExtended)
             // Material3
             implementation("org.jetbrains.compose.material3:material3-desktop:1.4.0")
             // Animations
@@ -40,11 +40,6 @@ kotlin {
             // QR Code generator
             implementation("com.google.zxing:core:3.5.1")
             implementation("com.google.zxing:javase:3.5.1")
-
-            // Video player
-            //implementation("uk.co.caprica:vlcj:4.7.0")
-            //implementation(libs.alert.kmp)
-
             // Navigation
             implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
             // Coil
@@ -66,28 +61,19 @@ kotlin {
             // Koin (DI)
             implementation("io.insert-koin:koin-core:3.5.6")
             implementation("io.insert-koin:koin-compose:1.1.0")
-
-            /*implementation("org.openjfx:javafx-controls:17.0.16")
-            implementation("org.openjfx:javafx-graphics:17.0.16")
-            implementation("org.openjfx:javafx-fxml:17.0.16")*/
-            /*val fxSuffix = "win"
-            implementation("org.openjfx:javafx-base:17:${fxSuffix}")
-            implementation("org.openjfx:javafx-graphics:17:${fxSuffix}")
-            implementation("org.openjfx:javafx-controls:17:${fxSuffix}")
-            implementation("org.openjfx:javafx-swing:17:${fxSuffix}")
-            implementation("org.openjfx:javafx-web:17:${fxSuffix}")
-            implementation("org.openjfx:javafx-media:17:${fxSuffix}")*/
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
 
             // VideoPlayer
-            implementation("uk.co.caprica:vlcj:4.7.0")
             implementation("org.jetbrains.compose.ui:ui-graphics:1.1.1")
             implementation("uk.co.caprica:vlcj:4.8.2")
 
-            //implementation("io.github.khubaibkhan4:mediaplayer-kmp:2.0.9")
+            // WebView. For VK Videos
+            //api("io.github.kevinnzou:compose-webview-multiplatform:2.0.3")
+            // KCEF зависимости
+            //implementation("dev.datlag:kcef:2025.03.23")
         }
     }
 }
@@ -96,6 +82,17 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "org.example.bigdisplayproject.MainKt"
+
+        // Возможно раскомментить для настройки KCEF
+        /*jvmArgs("--add-opens", "java.desktop/sun.awt=ALL-UNNAMED")
+        jvmArgs("--add-opens", "java.desktop/java.awt.peer=ALL-UNNAMED") // recommended but not necessary
+        jvmArgs += listOf(
+            "--add-opens=java.desktop/sun.java2d=ALL-UNNAMED",
+            "--add-opens=java.desktop/sun.awt.windows=ALL-UNNAMED",
+            "-Dkcef.verbose=true",
+            "-Dprism.order=sw", // Использовать software renderer
+            "-Dprism.verbose=true" // Логи рендерера
+        )*/
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

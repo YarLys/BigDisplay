@@ -36,7 +36,7 @@ class CursorUdpService {
 
             val responseString = String(responsePacket.data, 0, responsePacket.length)
             println("CURSOR: Cursor data received successfully")
-            println("CURSOR_DATA: $responseString")
+            //println("CURSOR_DATA: $responseString")
             val cursorData = json.decodeFromString<CursorData>(responseString)
             Result.success(cursorData)
         } catch (e: Exception) {

@@ -14,9 +14,10 @@ interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
     sealed interface Intent : JvmSerializable {
         object GetNews : Intent
         data class GetNewsById(val id: Long) : Intent
-        object Refresh : Intent
         data class UpdateScrollPosition(val position: Int) : Intent
-        data class DownloadFile(val url: String, val outputPath: String): Intent
+        data class DownloadFile(val url: String, val outputPath: String) : Intent
+        object EnableSaveScrollPosition : Intent
+        object DisableSaveScrollPosition : Intent
     }
 
     // Сообщения от executor к reducer
@@ -27,6 +28,8 @@ interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
         object Loading : Message
         data class ScrollPositionUpdated(val position: Int) : Message
         object FileDownloaded: Message
+        object EnableSaveScrollPosition : Message
+        object DisableSaveScrollPosition : Message
     }
 
     // Состояние
@@ -35,7 +38,8 @@ interface NewsStore : Store<NewsStore.Intent, NewsStore.State, Nothing> {
         val news: List<News> = emptyList(),
         val selectedNews: News? = null,
         val error: String? = null,
-        val scrollPosition: Int = 0
+        val scrollPosition: Int = 0,
+        val shouldSaveScrollPosition: Boolean = true
     ) : JvmSerializable
 
 }

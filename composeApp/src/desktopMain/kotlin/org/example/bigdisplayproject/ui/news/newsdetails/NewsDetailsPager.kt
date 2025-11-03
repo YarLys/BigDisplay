@@ -85,28 +85,20 @@ fun newsDetailsPager(
                 }
 
                 is Video -> {
-                    src = "https://vk.com/clip${attachment.objectId}_${attachment.ownedId}"
-                    //src = "https://storage.yandexcloud.net/media-screen/560255de7a2498a4ca653a13eb776f18e2ea53d3bffd83fc2bd8ce3310d9bc79.mp4"
+                    src = "https://vk.com/video${attachment.ownedId}_${attachment.objectId}"
                 }
 
                 else -> {}
             }
             if (attachment is Video) {
-                val videoPlayerState = rememberVideoPlayerState()
-                VideoPlayer(
-                    mrl = src,
-                    state = videoPlayerState,
+                // TODO:
+                /*PlayVkVideo(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .clip(RoundedCornerShape(16.dp))
                         .background(color = Color.Transparent, shape = RoundedCornerShape(16.dp))
                         .fillMaxSize()
-                )
-                LaunchedEffect(src) {
-                    videoPlayerState.doWithMediaPlayer { mediaPlayer ->
-                        mediaPlayer.play()
-                    }
-                }
+                )*/
             } else {
                 if (shouldApplyBlur(
                         IntSize(width = imageWidth, height = imageHeight),

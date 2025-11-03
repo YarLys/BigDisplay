@@ -5,6 +5,11 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.example.bigdisplayproject.data.remote.dto.slider.GroupSlidesData
 import org.example.bigdisplayproject.data.remote.dto.slider.SlideVideo
@@ -12,6 +17,7 @@ import org.example.bigdisplayproject.domain.usecases.common.DownloadFileUseCase
 import org.example.bigdisplayproject.domain.usecases.slider.GetSlidesUseCase
 import org.example.bigdisplayproject.domain.util.onError
 import org.example.bigdisplayproject.domain.util.onSuccess
+import org.example.bigdisplayproject.ui.news.store.NewsStore
 
 internal class SliderStoreFactory(
     private val storeFactory: StoreFactory,
@@ -40,6 +46,8 @@ internal class SliderStoreFactory(
         private val downloadFileUseCase: DownloadFileUseCase
     ) : CoroutineExecutor<SliderStore.Intent, SliderStore.Action, SliderStore.State, SliderStore.Message, Nothing>() {
 
+        private var slidesRefreshJob: Job? = null
+
         override fun executeAction(action: SliderStore.Action) {    // process actions from bootstrapper
             when (action) {
                 is SliderStore.Action.LoadSlides -> getSlides()
@@ -55,15 +63,40 @@ internal class SliderStoreFactory(
 
         private fun getSlides() = scope.launch {
             dispatch(SliderStore.Message.Loading)
-            val slides = getSlidesUseCase()
-                .onSuccess {
-                    dispatch(SliderStore.Message.SlidesLoaded(it))
-                    downloadVideos(it)
+            startPeriodicSlidesRefresh()
+        }
+
+        fun startPeriodicSlidesRefresh(intervalMillis: Long = 60 * 50 * 1000) {  // обновление новостей раз в 50 мин
+            stopPeriodicSlidesRefresh() // Останавливаем предыдущую задачу
+
+            slidesRefreshJob = CoroutineScope(Dispatchers.IO).launch {
+                while (isActive) {
+                    refreshSlides()
+                    delay(intervalMillis)
                 }
-                .onError {
-                    println("ERROR: ${it.toString()}")
-                    dispatch(SliderStore.Message.Error(it.toString()))
-                }
+            }
+        }
+
+        fun stopPeriodicSlidesRefresh() {
+            slidesRefreshJob?.cancel()
+            slidesRefreshJob = null
+        }
+
+        private suspend fun refreshSlides() {
+            try {
+                getSlidesUseCase()
+                    .onSuccess { slides ->
+                        dispatch(SliderStore.Message.SlidesLoaded(slides))
+                        downloadVideos(slides)
+                        println("Slides refreshed at ${System.currentTimeMillis()}")
+                    }
+                    .onError { error ->
+                        dispatch(SliderStore.Message.Error(error.toString()))
+                        println("Error refreshing slides: $error")
+                    }
+            } catch (e: Exception) {
+                println("Exception in slides refresh: ${e.message}")
+            }
         }
 
         private fun downloadVideos(slidesData: GroupSlidesData) = scope.launch {
@@ -72,7 +105,7 @@ internal class SliderStoreFactory(
             for (slide in slides) {
                 if (slide.mediaContent is SlideVideo) {
                     val url = slide.mediaContent.videoContent.src
-                    fileNum++   // TODO нормальную нумерацию видео
+                    fileNum++   // TODO нормальную нумерацию видео в слайдере. Но пока что там одно видео, к тому же оно отображается по ссылке
                     val outputPath = "D:\\Projects\\Kotlin\\Android\\KMP\\BigDisplayProject\\sliderVideo\\video${fileNum}.mp4"
 
                     downloadFile(url, outputPath)

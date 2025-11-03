@@ -121,8 +121,8 @@ class CalendarParser {
 
 // вычисление четности недели по дате относительно даты первой недели семестра
 fun getParity(date: LocalDate): Int {
-    // TODO: Раскомментить для 1 семестра 2025-2026 учебного года
-    val firstDate = java.time.LocalDate.of(2025, 9, 1)
+    // TODO: Изменить для следующего семестра
+    val firstDate = java.time.LocalDate.of(2025, 9, 1)  // Необходимо вставить дату первого учебного дня нового семестра
 
     val currentDate = java.time.LocalDate.of(date.year, date.monthNumber, date.dayOfMonth)
     // Вычисляем четность недели: вычитаем из номера текущей недели номер первой недели семестра и находим остаток
@@ -132,8 +132,8 @@ fun getParity(date: LocalDate): Int {
 
 // вычисление номера недели в семестре
 fun getWeekNumber(date: LocalDate): Int {
-    // TODO: Раскомментить для 1 семестра 2025-2026 учебного года
-    val firstDate = java.time.LocalDate.of(2025, 9, 1)
+    // TODO: Изменить для следующего семестра
+    val firstDate = java.time.LocalDate.of(2025, 9, 1) // Необходимо вставить дату первого учебного дня нового семестра
 
     val currentDate = java.time.LocalDate.of(date.year, date.monthNumber, date.dayOfMonth)
     return currentDate.get(WeekFields.ISO.weekOfYear()) - firstDate.get(WeekFields.ISO.weekOfYear()) + 1
